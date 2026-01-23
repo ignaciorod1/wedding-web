@@ -1,0 +1,176 @@
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle2, XCircle, Heart, Users } from "lucide-react";
+
+export function RSVPForm() {
+  const { guest, weddingDetails, rsvpResponse, submitRsvp } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [plusOneAttending, setPlusOneAttending] = useState(
+    rsvpResponse?.plus_one_attending ?? false
+  );
+  const [dietaryRestrictions, setDietaryRestrictions] = useState(
+    rsvpResponse?.dietary_restrictions ?? ""
+  );
+  const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
+
+  if (!guest || !weddingDetails) return null;
+
+  const handleRSVP = async (attending: boolean) => {
+    setIsSubmitting(true);
+
+    const success = await submitRsvp(
+      attending,
+      attending ? plusOneAttending : false,
+      dietaryRestrictions || undefined
+    );
+
+    if (success) {
+      setShowConfirmation(true);
+    }
+    setIsSubmitting(false);
+  };
+
+  if (showConfirmation && rsvpResponse) {
+    return (
+      <section className="py-16 px-4">
+        <div className="max-w-lg mx-auto">
+          <Card className="border-border/50 text-center">
+            <CardContent className="pt-8 pb-8">
+              {rsvpResponse.attending ? (
+                <>
+                  <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-6">
+                    <CheckCircle2 className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="font-serif text-2xl mb-2 text-foreground">
+                    {"We can't wait to see you!"}
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Thank you for confirming your attendance, {guest.name}.
+                    {rsvpResponse.plus_one_attending &&
+                      guest.plus_one &&
+                      " We've noted that you'll be bringing a guest."}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Mark your calendar for {weddingDetails.date}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-6">
+                    <Heart className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-serif text-2xl mb-2 text-foreground">
+                    {"We'll miss you!"}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Thank you for letting us know, {guest.name}. {"You'll"} be
+                    in our thoughts on our special day.
+                  </p>
+                </>
+              )}
+              <Button
+                variant="outline"
+                className="mt-6 bg-transparent"
+                onClick={() => setShowConfirmation(false)}
+              >
+                Update Response
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-16 px-4">
+      <div className="max-w-lg mx-auto">
+        <div className="text-center mb-8">
+          <p className="text-sm tracking-[0.2em] uppercase text-muted-foreground mb-2">
+            Kindly respond by {weddingDetails.rsvp_deadline}
+          </p>
+          <h2 className="font-serif text-4xl font-light text-foreground">
+            RSVP
+          </h2>
+        </div>
+
+        <Card className="border-border/50">
+          <CardHeader className="text-center">
+            <CardTitle className="font-serif text-xl font-normal">
+              Hello, {guest.name}
+            </CardTitle>
+            <CardDescription>
+              Will you be joining us on our special day?
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {guest.plus_one && (
+              <div className="flex items-center space-x-3 p-4 bg-secondary/50 rounded-lg">
+                <Checkbox
+                  id="plusOne"
+                  checked={plusOneAttending}
+                  onCheckedChange={(checked) =>
+                    setPlusOneAttending(checked as boolean)
+                  }
+                />
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <Label htmlFor="plusOne" className="text-sm cursor-pointer">
+                    {"I'll be bringing a guest (+1)"}
+                  </Label>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="dietary" className="text-sm font-medium">
+                Dietary Restrictions (optional)
+              </Label>
+              <Textarea
+                id="dietary"
+                placeholder="Please let us know of any dietary restrictions or allergies..."
+                value={dietaryRestrictions}
+                onChange={(e) => setDietaryRestrictions(e.target.value)}
+                className="resize-none"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                className="flex-1 h-12 gap-2"
+                onClick={() => handleRSVP(true)}
+                disabled={isSubmitting}
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                {isSubmitting ? "Submitting..." : "Joyfully Accept"}
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-12 gap-2 bg-transparent"
+                onClick={() => handleRSVP(false)}
+                disabled={isSubmitting}
+              >
+                <XCircle className="w-5 h-5" />
+                Regretfully Decline
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}

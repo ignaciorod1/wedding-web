@@ -12,7 +12,7 @@ export function HeroSection() {
   const date = weddingDetails?.date ?? "";
 
   return (
-    <section className="relative min-h-screen md:min-h-[70vh] flex items-center justify-center overflow-hidden bg-background">
+    <section className="relative min-h-screen md:min-h-[70vh] flex items-center justify-center overflow-hidden">
       {/* Background VIDEO - loops automatically */}
       <video
         autoPlay
@@ -20,19 +20,23 @@ export function HeroSection() {
         loop
         playsInline
         preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="fixed
+          inset-0
+          w-screen
+          h-screen
+          object-cover
+          z-[-1]"
       >
         <source src="background.mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-black/40" />
-      console.log(weddingDetails);
 
 
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
         <p className="text-sm tracking-[0.3em] uppercase text-white/80 mb-6">
-          You are cordially invited to
+          ¡nos casamos!
         </p>
 
         <h1 className="font-serif text-6xl md:text-8xl font-light text-white mb-6 tracking-wide text-balance drop-shadow-lg">
@@ -50,11 +54,9 @@ export function HeroSection() {
         </p>
 
         <p className="mt-12 text-sm text-white/70 max-w-md mx-auto leading-relaxed">
-          Please log in with your personal invitation code to view the full
-          event details and confirm your attendance.
+          Introduce tu codigo personal para ver los detalles el evento y confirmar tu asistencia.
         </p>
       </div>
     </section>
   );
 }
-console.log("SUPABASE_URL 👉", process.env.NEXT_PUBLIC_SUPABASE_URL);

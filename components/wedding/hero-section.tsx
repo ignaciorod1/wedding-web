@@ -32,7 +32,7 @@ export function HeroSection() {
 
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
         <p className="text-sm tracking-[0.3em] uppercase text-white/80 mb-6">
-          You are cordially invited to
+          ¡Nos casamos!  
         </p>
 
         <h1 className="font-serif text-6xl md:text-8xl font-light text-white mb-6 tracking-wide text-balance drop-shadow-lg">
@@ -50,8 +50,7 @@ export function HeroSection() {
         </p>
 
         <p className="mt-12 text-sm text-white/70 max-w-md mx-auto leading-relaxed">
-          Please log in with your personal invitation code to view the full
-          event details and confirm your attendance.
+          Introduce tu codigo personal para ver los detalles el evento y confirmar tu asistencia 
         </p>
       </div>
     </section>

@@ -27,6 +27,8 @@ export function HeroSection() {
 
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-black/40" />
+      console.log(weddingDetails);
+
 
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
         <p className="text-sm tracking-[0.3em] uppercase text-white/80 mb-6">
@@ -55,3 +57,4 @@ export function HeroSection() {
     </section>
   );
 }
+console.log("SUPABASE_URL 👉", process.env.NEXT_PUBLIC_SUPABASE_URL);

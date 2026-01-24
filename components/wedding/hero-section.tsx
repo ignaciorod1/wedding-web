@@ -54,7 +54,7 @@ export function HeroSection() {
         </p>
 
         <p className="mt-12 text-sm text-white/70 max-w-md mx-auto leading-relaxed">
-          Introduce tu codigo personal para ver los detalles el evento y confirmar tu asistencia.
+          Introduce tu código personal para ver los detalles el evento y confirmar tu asistencia.
         </p>
       </div>
     </section>

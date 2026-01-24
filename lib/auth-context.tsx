@@ -110,11 +110,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   const login = async (code: string): Promise<boolean> => {
-    const { data: guestData } = await supabase
+    console.log("[v0] Attempting login with code:", code.trim());
+    
+    const { data: guestData, error } = await supabase
       .from("guests")
       .select("*")
       .ilike("code", code.trim())
       .single();
+
+    console.log("[v0] Login query result - data:", guestData, "error:", error);
 
     if (guestData) {
       setGuest(guestData);

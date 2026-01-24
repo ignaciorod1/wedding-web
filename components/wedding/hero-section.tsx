@@ -5,11 +5,8 @@ import { useAuth } from "@/lib/auth-context";
 export function HeroSection() {
   const { weddingDetails } = useAuth();
 
-  const coupleName = weddingDetails
-    ? `${weddingDetails.couple_name_1} & ${weddingDetails.couple_name_2}`
-    : "Our Wedding";
-
-  const date = weddingDetails?.date ?? "";
+  const coupleName = weddingDetails?.couple_names ?? "Our Wedding";
+  const date = weddingDetails?.wedding_date ?? "";
 
   return (
     <section className="relative min-h-screen md:min-h-[70vh] flex items-center justify-center overflow-hidden">

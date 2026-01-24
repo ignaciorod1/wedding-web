@@ -37,9 +37,9 @@ export function EventDetails() {
                 <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium text-foreground">
-                    {weddingDetails.date}
+                    {weddingDetails.wedding_date}
                   </p>
-                  <p className="text-muted-foreground">{weddingDetails.time}</p>
+                  <p className="text-muted-foreground">{weddingDetails.ceremony_time}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">

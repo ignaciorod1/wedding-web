@@ -14,16 +14,18 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, XCircle, Heart, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export function RSVPForm() {
   const { guest, weddingDetails, rsvpResponse, submitRsvp } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [plusOneAttending, setPlusOneAttending] = useState(
-    rsvpResponse?.plus_one_attending ?? false
+  const [plusOneName, setPlusOneName] = useState(
+    rsvpResponse?.plus_one_name ?? ""
   );
   const [dietaryRestrictions, setDietaryRestrictions] = useState(
     rsvpResponse?.dietary_restrictions ?? ""
   );
+  const [message, setMessage] = useState(rsvpResponse?.message ?? "");
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
 
   if (!guest || !weddingDetails) return null;
@@ -33,8 +35,9 @@ export function RSVPForm() {
 
     const success = await submitRsvp(
       attending,
-      attending ? plusOneAttending : false,
-      dietaryRestrictions || undefined
+      attending && plusOneName ? plusOneName : undefined,
+      dietaryRestrictions || undefined,
+      message || undefined
     );
 
     if (success) {
@@ -59,12 +62,11 @@ export function RSVPForm() {
                   </h3>
                   <p className="text-muted-foreground mb-4">
                     Thank you for confirming your attendance, {guest.name}.
-                    {rsvpResponse.plus_one_attending &&
-                      guest.plus_one &&
-                      " We've noted that you'll be bringing a guest."}
+                    {rsvpResponse.plus_one_name &&
+                      ` We've noted that you'll be bringing ${rsvpResponse.plus_one_name}.`}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Mark your calendar for {weddingDetails.date}
+                    Mark your calendar for {weddingDetails.wedding_date}
                   </p>
                 </>
               ) : (
@@ -100,7 +102,7 @@ export function RSVPForm() {
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
           <p className="text-sm tracking-[0.2em] uppercase text-muted-foreground mb-2">
-            Kindly respond by {weddingDetails.rsvp_deadline}
+            Kindly respond
           </p>
           <h2 className="font-serif text-4xl font-light text-foreground">
             RSVP
@@ -117,21 +119,20 @@ export function RSVPForm() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {guest.plus_one && (
-              <div className="flex items-center space-x-3 p-4 bg-secondary/50 rounded-lg">
-                <Checkbox
-                  id="plusOne"
-                  checked={plusOneAttending}
-                  onCheckedChange={(checked) =>
-                    setPlusOneAttending(checked as boolean)
-                  }
-                />
+            {guest.plus_one_allowed && (
+              <div className="space-y-2 p-4 bg-secondary/50 rounded-lg">
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-muted-foreground" />
-                  <Label htmlFor="plusOne" className="text-sm cursor-pointer">
-                    {"I'll be bringing a guest (+1)"}
+                  <Label htmlFor="plusOneName" className="text-sm font-medium">
+                    {"Bringing a guest? Enter their name (+1)"}
                   </Label>
                 </div>
+                <Input
+                  id="plusOneName"
+                  placeholder="Guest's full name (leave blank if not bringing anyone)"
+                  value={plusOneName}
+                  onChange={(e) => setPlusOneName(e.target.value)}
+                />
               </div>
             )}
 
@@ -145,7 +146,21 @@ export function RSVPForm() {
                 value={dietaryRestrictions}
                 onChange={(e) => setDietaryRestrictions(e.target.value)}
                 className="resize-none"
-                rows={3}
+                rows={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-sm font-medium">
+                Message for the couple (optional)
+              </Label>
+              <Textarea
+                id="message"
+                placeholder="Share a message or well wishes..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="resize-none"
+                rows={2}
               />
             </div>
 

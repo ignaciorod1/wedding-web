@@ -28,6 +28,8 @@ export interface WeddingDetails {
   reception_venue: string;
   reception_address: string;
   dress_code: string;
+  bus_pickup_schedule: string;
+  bus_dropoff_schedule: string;
 }
 
 export interface RsvpResponse {
@@ -38,6 +40,9 @@ export interface RsvpResponse {
   plus_one_name: string | null;
   dietary_restrictions: string | null;
   message: string | null;
+  needs_bus: boolean;
+  bus_pickup_location: string | null;
+  bus_dropoff_location: string | null;
   responded_at: string;
 }
 
@@ -48,7 +53,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (code: string) => Promise<boolean>;
   logout: () => void;
-  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string) => Promise<boolean>;
+  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string, needsBus?: boolean, busPickup?: string, busDropoff?: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -146,11 +151,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     attending: boolean,
     plusOneName?: string,
     dietary?: string,
-    message?: string
+    message?: string,
+    needsBus?: boolean,
+    busPickup?: string,
+    busDropoff?: string
   ): Promise<boolean> => {
     if (!guest) return false;
-
-    console.log("[v0] Submitting RSVP for guest:", guest.id, { attending, plusOneName, dietary, message });
 
     // Check if RSVP already exists
     const { data: existingRsvp } = await supabase
@@ -158,8 +164,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select("*")
       .eq("guest_id", guest.id)
       .single();
-
-    console.log("[v0] Existing RSVP check:", existingRsvp);
 
     if (existingRsvp) {
       // Update existing RSVP
@@ -171,12 +175,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
           message: message || null,
+          needs_bus: needsBus || false,
+          bus_pickup_location: busPickup || null,
+          bus_dropoff_location: busDropoff || null,
         })
         .eq("guest_id", guest.id)
         .select()
         .single();
 
-      console.log("[v0] Update RSVP result - data:", data, "error:", error);
       if (error) return false;
       setRsvpResponse(data);
     } else {
@@ -190,11 +196,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
           message: message || null,
+          needs_bus: needsBus || false,
+          bus_pickup_location: busPickup || null,
+          bus_dropoff_location: busDropoff || null,
         })
         .select()
         .single();
 
-      console.log("[v0] Insert RSVP result - data:", data, "error:", error);
       if (error) return false;
       setRsvpResponse(data);
     }

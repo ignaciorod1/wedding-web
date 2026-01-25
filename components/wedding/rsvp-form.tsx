@@ -13,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, XCircle, Heart, Users } from "lucide-react";
+import { CheckCircle2, XCircle, Heart, Users, Bus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export function RSVPForm() {
@@ -26,6 +26,13 @@ export function RSVPForm() {
     rsvpResponse?.dietary_restrictions ?? ""
   );
   const [message, setMessage] = useState(rsvpResponse?.message ?? "");
+  const [needsBus, setNeedsBus] = useState(rsvpResponse?.needs_bus ?? false);
+  const [busPickupLocation, setBusPickupLocation] = useState(
+    rsvpResponse?.bus_pickup_location ?? ""
+  );
+  const [busDropoffLocation, setBusDropoffLocation] = useState(
+    rsvpResponse?.bus_dropoff_location ?? ""
+  );
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
 
   if (!guest || !weddingDetails) return null;
@@ -37,7 +44,10 @@ export function RSVPForm() {
       attending,
       attending && plusOneName ? plusOneName : undefined,
       dietaryRestrictions || undefined,
-      message || undefined
+      message || undefined,
+      attending && needsBus ? needsBus : false,
+      attending && needsBus && busPickupLocation ? busPickupLocation : undefined,
+      attending && needsBus && busDropoffLocation ? busDropoffLocation : undefined
     );
 
     if (success) {
@@ -64,6 +74,8 @@ export function RSVPForm() {
                     Thank you for confirming your attendance, {guest.name}.
                     {rsvpResponse.plus_one_name &&
                       ` We've noted that you'll be bringing ${rsvpResponse.plus_one_name}.`}
+                    {rsvpResponse.needs_bus &&
+                      ` We've reserved a spot for you on the shuttle bus.`}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Mark your calendar for {weddingDetails.wedding_date}
@@ -162,6 +174,65 @@ export function RSVPForm() {
                 className="resize-none"
                 rows={2}
               />
+            </div>
+
+            {/* Bus Service Section */}
+            <div className="space-y-4 p-4 bg-secondary/50 rounded-lg border border-border/50">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Bus className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-foreground mb-1">
+                    Shuttle Bus Service
+                  </h4>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    We are providing complimentary shuttle bus service for our guests.
+                  </p>
+                  <div className="text-xs text-muted-foreground space-y-1 mb-3">
+                    <p><span className="font-medium">Pick-up:</span> {weddingDetails.bus_pickup_schedule}</p>
+                    <p><span className="font-medium">Drop-off:</span> {weddingDetails.bus_dropoff_schedule}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="needsBus"
+                  checked={needsBus}
+                  onCheckedChange={(checked) => setNeedsBus(checked === true)}
+                />
+                <Label htmlFor="needsBus" className="text-sm cursor-pointer">
+                  {"Yes, I'd like to use the shuttle bus service"}
+                </Label>
+              </div>
+
+              {needsBus && (
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="busPickup" className="text-sm font-medium">
+                      Pick-up Location
+                    </Label>
+                    <Input
+                      id="busPickup"
+                      placeholder="Enter your preferred pick-up location..."
+                      value={busPickupLocation}
+                      onChange={(e) => setBusPickupLocation(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="busDropoff" className="text-sm font-medium">
+                      Drop-off Location
+                    </Label>
+                    <Input
+                      id="busDropoff"
+                      placeholder="Enter your preferred drop-off location..."
+                      value={busDropoffLocation}
+                      onChange={(e) => setBusDropoffLocation(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">

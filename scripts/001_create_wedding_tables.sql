@@ -21,6 +21,9 @@ create table if not exists public.rsvp_responses (
   plus_one_name text,
   dietary_restrictions text,
   message text,
+  needs_bus boolean default false,
+  bus_pickup_location text,
+  bus_dropoff_location text,
   responded_at timestamp with time zone default now(),
   unique(guest_id)
 );
@@ -36,7 +39,9 @@ create table if not exists public.wedding_details (
   reception_time text not null default '6:00 PM',
   reception_venue text not null default 'The Grand Ballroom',
   reception_address text not null default '456 Celebration Ave, Beverly Hills, CA 90210',
-  dress_code text not null default 'Black Tie Optional'
+  dress_code text not null default 'Black Tie Optional',
+  bus_pickup_schedule text not null default '3:00 PM - Pick up from downtown',
+  bus_dropoff_schedule text not null default '11:00 PM - Return to downtown'
 );
 
 -- Insert default wedding details (you can update this in the Supabase dashboard)

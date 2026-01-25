@@ -27,12 +27,6 @@ export function RSVPForm() {
   );
   const [message, setMessage] = useState(rsvpResponse?.message ?? "");
   const [needsBus, setNeedsBus] = useState(rsvpResponse?.needs_bus ?? false);
-  const [busPickupLocation, setBusPickupLocation] = useState(
-    rsvpResponse?.bus_pickup_location ?? ""
-  );
-  const [busDropoffLocation, setBusDropoffLocation] = useState(
-    rsvpResponse?.bus_dropoff_location ?? ""
-  );
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
 
   if (!guest || !weddingDetails) return null;
@@ -45,9 +39,7 @@ export function RSVPForm() {
       attending && plusOneName ? plusOneName : undefined,
       dietaryRestrictions || undefined,
       message || undefined,
-      attending && needsBus ? needsBus : false,
-      attending && needsBus && busPickupLocation ? busPickupLocation : undefined,
-      attending && needsBus && busDropoffLocation ? busDropoffLocation : undefined
+      attending && needsBus ? needsBus : false
     );
 
     if (success) {
@@ -206,33 +198,6 @@ export function RSVPForm() {
                   {"Yes, I'd like to use the shuttle bus service"}
                 </Label>
               </div>
-
-              {needsBus && (
-                <div className="space-y-3 pt-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="busPickup" className="text-sm font-medium">
-                      Pick-up Location
-                    </Label>
-                    <Input
-                      id="busPickup"
-                      placeholder="Enter your preferred pick-up location..."
-                      value={busPickupLocation}
-                      onChange={(e) => setBusPickupLocation(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="busDropoff" className="text-sm font-medium">
-                      Drop-off Location
-                    </Label>
-                    <Input
-                      id="busDropoff"
-                      placeholder="Enter your preferred drop-off location..."
-                      value={busDropoffLocation}
-                      onChange={(e) => setBusDropoffLocation(e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">

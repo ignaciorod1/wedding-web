@@ -22,8 +22,6 @@ create table if not exists public.rsvp_responses (
   dietary_restrictions text,
   message text,
   needs_bus boolean default false,
-  bus_pickup_location text,
-  bus_dropoff_location text,
   responded_at timestamp with time zone default now(),
   unique(guest_id)
 );

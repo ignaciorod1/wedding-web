@@ -41,8 +41,6 @@ export interface RsvpResponse {
   dietary_restrictions: string | null;
   message: string | null;
   needs_bus: boolean;
-  bus_pickup_location: string | null;
-  bus_dropoff_location: string | null;
   responded_at: string;
 }
 
@@ -53,7 +51,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (code: string) => Promise<boolean>;
   logout: () => void;
-  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string, needsBus?: boolean, busPickup?: string, busDropoff?: string) => Promise<boolean>;
+  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string, needsBus?: boolean) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -152,9 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     plusOneName?: string,
     dietary?: string,
     message?: string,
-    needsBus?: boolean,
-    busPickup?: string,
-    busDropoff?: string
+    needsBus?: boolean
   ): Promise<boolean> => {
     if (!guest) return false;
 
@@ -176,8 +172,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           dietary_restrictions: dietary || null,
           message: message || null,
           needs_bus: needsBus || false,
-          bus_pickup_location: busPickup || null,
-          bus_dropoff_location: busDropoff || null,
         })
         .eq("guest_id", guest.id)
         .select()
@@ -197,8 +191,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           dietary_restrictions: dietary || null,
           message: message || null,
           needs_bus: needsBus || false,
-          bus_pickup_location: busPickup || null,
-          bus_dropoff_location: busDropoff || null,
         })
         .select()
         .single();

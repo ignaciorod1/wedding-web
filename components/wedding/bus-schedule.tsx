@@ -19,9 +19,13 @@ function generateGoogleCalendarUrl(
 ): string {
   // Parse the wedding date and times
   // Assuming wedding_date is like "June 15, 2025" and times are like "18:00"
-  const eventDate = new Date(startDate);
-  const [startHour, startMin] = startTime.split(":").map(Number);
-  const [endHour, endMin] = endTime.split(":").map(Number);
+  const safeStartDate = startDate || "June 15, 2025";
+  const safeStartTime = startTime || "18:00";
+  const safeEndTime = endTime || "19:00";
+  
+  const eventDate = new Date(safeStartDate);
+  const [startHour, startMin] = safeStartTime.split(":").map(Number);
+  const [endHour, endMin] = safeEndTime.split(":").map(Number);
 
   const start = new Date(eventDate);
   start.setHours(startHour, startMin, 0);
@@ -57,9 +61,13 @@ function generateICSFile(
   startTime: string,
   endTime: string
 ): string {
-  const eventDate = new Date(startDate);
-  const [startHour, startMin] = startTime.split(":").map(Number);
-  const [endHour, endMin] = endTime.split(":").map(Number);
+  const safeStartDate = startDate || "June 15, 2025";
+  const safeStartTime = startTime || "18:00";
+  const safeEndTime = endTime || "19:00";
+  
+  const eventDate = new Date(safeStartDate);
+  const [startHour, startMin] = safeStartTime.split(":").map(Number);
+  const [endHour, endMin] = safeEndTime.split(":").map(Number);
 
   const start = new Date(eventDate);
   start.setHours(startHour, startMin, 0);
@@ -222,22 +230,42 @@ function ScheduleRow({
 }
 
 export function BusSchedule({ weddingDetails }: BusScheduleProps) {
+  // Safe defaults for wedding details
+  const details = {
+    couple_names: weddingDetails?.couple_names || "The Couple",
+    wedding_date: weddingDetails?.wedding_date || "June 15, 2025",
+    ceremony_venue: weddingDetails?.ceremony_venue || "Wedding Venue",
+    ceremony_time: weddingDetails?.ceremony_time || "16:00",
+    bus_pickup_time: weddingDetails?.bus_pickup_time || "18:00",
+    bus_pickup_location: weddingDetails?.bus_pickup_location || "Pickup Location",
+    bus_pickup_maps_url: weddingDetails?.bus_pickup_maps_url || "#",
+    bus_pickup_arrival_time: weddingDetails?.bus_pickup_arrival_time || "18:30",
+    bus_pickup_arrival_location: weddingDetails?.bus_pickup_arrival_location || "Wedding Venue",
+    bus_pickup_arrival_maps_url: weddingDetails?.bus_pickup_arrival_maps_url || "#",
+    bus_dropoff_time: weddingDetails?.bus_dropoff_time || "06:00",
+    bus_dropoff_location: weddingDetails?.bus_dropoff_location || "Wedding Venue",
+    bus_dropoff_maps_url: weddingDetails?.bus_dropoff_maps_url || "#",
+    bus_dropoff_arrival_time: weddingDetails?.bus_dropoff_arrival_time || "06:30",
+    bus_dropoff_arrival_location: weddingDetails?.bus_dropoff_arrival_location || "Hotel",
+    bus_dropoff_arrival_maps_url: weddingDetails?.bus_dropoff_arrival_maps_url || "#",
+  };
+
   // Wedding event calendar URLs
   const weddingGoogleCalendarUrl = generateGoogleCalendarUrl(
-    `${weddingDetails.couple_names} Wedding`,
+    `${details.couple_names} Wedding`,
     `Wedding ceremony and reception`,
-    weddingDetails.ceremony_venue,
-    weddingDetails.wedding_date,
-    weddingDetails.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
+    details.ceremony_venue,
+    details.wedding_date,
+    details.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
     "23:00"
   );
 
   const weddingIcsFileUrl = generateICSFile(
-    `${weddingDetails.couple_names} Wedding`,
+    `${details.couple_names} Wedding`,
     `Wedding ceremony and reception`,
-    weddingDetails.ceremony_venue,
-    weddingDetails.wedding_date,
-    weddingDetails.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
+    details.ceremony_venue,
+    details.wedding_date,
+    details.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
     "23:00"
   );
 
@@ -246,13 +274,13 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
       {/* Pickup Schedule */}
       <ScheduleRow
         title="Pickup"
-        startTime={weddingDetails.bus_pickup_time}
-        startLocation={weddingDetails.bus_pickup_location}
-        startMapsUrl={weddingDetails.bus_pickup_maps_url}
-        endTime={weddingDetails.bus_pickup_arrival_time}
-        endLocation={weddingDetails.bus_pickup_arrival_location}
-        endMapsUrl={weddingDetails.bus_pickup_arrival_maps_url}
-        weddingDate={weddingDetails.wedding_date}
+        startTime={details.bus_pickup_time}
+        startLocation={details.bus_pickup_location}
+        startMapsUrl={details.bus_pickup_maps_url}
+        endTime={details.bus_pickup_arrival_time}
+        endLocation={details.bus_pickup_arrival_location}
+        endMapsUrl={details.bus_pickup_arrival_maps_url}
+        weddingDate={details.wedding_date}
       />
 
       {/* Divider */}
@@ -261,13 +289,13 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
       {/* Dropoff Schedule */}
       <ScheduleRow
         title="Drop off"
-        startTime={weddingDetails.bus_dropoff_time}
-        startLocation={weddingDetails.bus_dropoff_location}
-        startMapsUrl={weddingDetails.bus_dropoff_maps_url}
-        endTime={weddingDetails.bus_dropoff_arrival_time}
-        endLocation={weddingDetails.bus_dropoff_arrival_location}
-        endMapsUrl={weddingDetails.bus_dropoff_arrival_maps_url}
-        weddingDate={weddingDetails.wedding_date}
+        startTime={details.bus_dropoff_time}
+        startLocation={details.bus_dropoff_location}
+        startMapsUrl={details.bus_dropoff_maps_url}
+        endTime={details.bus_dropoff_arrival_time}
+        endLocation={details.bus_dropoff_arrival_location}
+        endMapsUrl={details.bus_dropoff_arrival_maps_url}
+        weddingDate={details.wedding_date}
       />
 
       {/* Wedding Event Calendar */}

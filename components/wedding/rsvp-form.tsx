@@ -13,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, XCircle, Heart, Users } from "lucide-react";
+import { CheckCircle2, XCircle, Heart, Users, Bus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { BusSchedule } from "@/components/wedding/bus-schedule";
 

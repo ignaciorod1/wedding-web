@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface Guest {
   id: string;
   name: string;
-  invitation_code: string;
+  code: string;
   plus_one_allowed: boolean;
   created_at: string;
 }
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: guestData, error } = await supabase
       .from("guests")
       .select("*")
-      .ilike("invitation_code", code.trim())
+      .ilike("code", code.trim())
       .single();
 
     if (guestData) {

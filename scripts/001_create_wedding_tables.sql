@@ -38,8 +38,20 @@ create table if not exists public.wedding_details (
   reception_venue text not null default 'The Grand Ballroom',
   reception_address text not null default '456 Celebration Ave, Beverly Hills, CA 90210',
   dress_code text not null default 'Black Tie Optional',
-  bus_pickup_schedule text not null default '3:00 PM - Pick up from downtown',
-  bus_dropoff_schedule text not null default '11:00 PM - Return to downtown'
+  -- Bus pickup details
+  bus_pickup_time text not null default '18:00',
+  bus_pickup_location text not null default 'Street A',
+  bus_pickup_maps_url text not null default 'https://maps.google.com/?q=Street+A',
+  bus_pickup_arrival_time text not null default '18:30',
+  bus_pickup_arrival_location text not null default 'Wedding Venue',
+  bus_pickup_arrival_maps_url text not null default 'https://maps.google.com/?q=Wedding+Venue',
+  -- Bus dropoff details
+  bus_dropoff_time text not null default '06:00',
+  bus_dropoff_location text not null default 'Wedding Venue',
+  bus_dropoff_maps_url text not null default 'https://maps.google.com/?q=Wedding+Venue',
+  bus_dropoff_arrival_time text not null default '06:30',
+  bus_dropoff_arrival_location text not null default 'Hotel',
+  bus_dropoff_arrival_maps_url text not null default 'https://maps.google.com/?q=Hotel'
 );
 
 -- Insert default wedding details (you can update this in the Supabase dashboard)

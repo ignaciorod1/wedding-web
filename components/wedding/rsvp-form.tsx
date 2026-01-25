@@ -13,8 +13,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, XCircle, Heart, Users, Bus } from "lucide-react";
+import { CheckCircle2, XCircle, Heart, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { BusSchedule } from "@/components/wedding/bus-schedule";
 
 export function RSVPForm() {
   const { guest, weddingDetails, rsvpResponse, submitRsvp } = useAuth();
@@ -169,26 +170,20 @@ export function RSVPForm() {
             </div>
 
             {/* Bus Service Section */}
-            <div className="space-y-4 p-4 bg-secondary/50 rounded-lg border border-border/50">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Bus className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-medium text-foreground mb-1">
-                    Shuttle Bus Service
-                  </h4>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    We are providing complimentary shuttle bus service for our guests.
-                  </p>
-                  <div className="text-xs text-muted-foreground space-y-1 mb-3">
-                    <p><span className="font-medium">Pick-up:</span> {weddingDetails.bus_pickup_schedule}</p>
-                    <p><span className="font-medium">Drop-off:</span> {weddingDetails.bus_dropoff_schedule}</p>
-                  </div>
-                </div>
+            <div className="space-y-4 p-5 bg-secondary/50 rounded-lg border border-border/50">
+              <div className="flex items-center gap-2 justify-center mb-2">
+                <Bus className="w-5 h-5 text-primary" />
+                <h4 className="font-serif text-lg text-foreground">
+                  Shuttle Bus Service
+                </h4>
               </div>
+              <p className="text-xs text-center text-muted-foreground mb-4">
+                We are providing complimentary shuttle bus service for our guests.
+              </p>
 
-              <div className="flex items-center gap-2">
+              <BusSchedule weddingDetails={weddingDetails} />
+
+              <div className="flex items-center justify-center gap-2 pt-4 border-t border-border/50">
                 <Checkbox
                   id="needsBus"
                   checked={needsBus}

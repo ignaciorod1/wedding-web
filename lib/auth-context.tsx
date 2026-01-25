@@ -28,8 +28,20 @@ export interface WeddingDetails {
   reception_venue: string;
   reception_address: string;
   dress_code: string;
-  bus_pickup_schedule: string;
-  bus_dropoff_schedule: string;
+  // Bus pickup details
+  bus_pickup_time: string;
+  bus_pickup_location: string;
+  bus_pickup_maps_url: string;
+  bus_pickup_arrival_time: string;
+  bus_pickup_arrival_location: string;
+  bus_pickup_arrival_maps_url: string;
+  // Bus dropoff details
+  bus_dropoff_time: string;
+  bus_dropoff_location: string;
+  bus_dropoff_maps_url: string;
+  bus_dropoff_arrival_time: string;
+  bus_dropoff_arrival_location: string;
+  bus_dropoff_arrival_maps_url: string;
 }
 
 export interface RsvpResponse {

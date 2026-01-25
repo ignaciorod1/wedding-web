@@ -13,7 +13,7 @@ export interface Guest {
   id: string;
   name: string;
   email: string | null;
-  invitation_code: string;
+  code: string;
   plus_one_allowed: boolean;
   created_at: string;
 }

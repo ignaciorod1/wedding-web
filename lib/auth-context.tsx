@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: guestData, error } = await supabase
       .from("guests")
       .select("*")
-      .ilike("invitation_code", code.trim())
+      .ilike("code", code.trim())
       .single();
 
     if (guestData) {

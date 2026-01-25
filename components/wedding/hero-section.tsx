@@ -24,7 +24,7 @@ export function HeroSection() {
           object-cover
           z-[-1]"
       >
-        <source src="/background2.mp4" type="video/mp4" />
+        <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_M7YK86wYeG2RNtxWTHWJgj0SK8DG/ncV2k8Zke-UvJlCtNTH_uV/public/background2.mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay for text readability */}

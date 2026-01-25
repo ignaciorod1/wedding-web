@@ -12,8 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface Guest {
   id: string;
   name: string;
-  email: string | null;
-  code: string;
+  invitation_code: string;
   plus_one_allowed: boolean;
   created_at: string;
 }
@@ -34,6 +33,7 @@ export interface WeddingDetails {
 export interface RsvpResponse {
   id: string;
   guest_id: string;
+  guest_name: string;
   attending: boolean;
   plus_one_name: string | null;
   dietary_restrictions: string | null;
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: guestData, error } = await supabase
       .from("guests")
       .select("*")
-      .ilike("code", code.trim())
+      .ilike("invitation_code", code.trim())
       .single();
 
     if (guestData) {
@@ -166,6 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from("rsvp_responses")
         .update({
+          guest_name: guest.name,
           attending,
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
@@ -184,6 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from("rsvp_responses")
         .insert({
           guest_id: guest.id,
+          guest_name: guest.name,
           attending,
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,

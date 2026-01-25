@@ -5,7 +5,6 @@
 create table if not exists public.guests (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  email text,
   invitation_code text unique not null,
   plus_one_allowed boolean default false,
   created_at timestamp with time zone default now()
@@ -17,6 +16,7 @@ create table if not exists public.guests (
 create table if not exists public.rsvp_responses (
   id uuid primary key default gen_random_uuid(),
   guest_id uuid not null references public.guests(id) on delete cascade,
+  guest_name text not null,
   attending boolean not null,
   plus_one_name text,
   dietary_restrictions text,
@@ -68,10 +68,10 @@ create policy "Allow public to read wedding_details" on public.wedding_details
   for select using (true);
 
 -- Insert some example guests (you can delete these and add your own)
-insert into public.guests (name, email, invitation_code, plus_one_allowed) values
-  ('John Smith', 'john@example.com', 'JOHN2025', true),
-  ('Sarah Johnson', 'sarah@example.com', 'SARAH2025', true),
-  ('Mike Williams', 'mike@example.com', 'MIKE2025', false),
-  ('Emily Brown', 'emily@example.com', 'EMILY2025', true),
-  ('David Miller', 'david@example.com', 'DAVID2025', false)
+insert into public.guests (name, invitation_code, plus_one_allowed) values
+  ('John Smith', 'JOHN2025', true),
+  ('Sarah Johnson', 'SARAH2025', true),
+  ('Mike Williams', 'MIKE2025', false),
+  ('Emily Brown', 'EMILY2025', true),
+  ('David Miller', 'DAVID2025', false)
 on conflict (invitation_code) do nothing;

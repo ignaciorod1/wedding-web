@@ -12,33 +12,33 @@ import { createClient } from "@/lib/supabase/client";
 export interface Guest {
   id: string;
   name: string;
+  email: string | null;
   code: string;
-  plus_one: boolean;
-  table_number: number | null;
+  plus_one_allowed: boolean;
+  created_at: string;
 }
 
 export interface WeddingDetails {
   id: string;
-  couple_name_1: string;
-  couple_name_2: string;
-  date: string;
-  time: string;
+  couple_names: string;
+  wedding_date: string;
+  ceremony_time: string;
   ceremony_venue: string;
   ceremony_address: string;
+  reception_time: string;
   reception_venue: string;
   reception_address: string;
-  reception_time: string;
   dress_code: string;
-  rsvp_deadline: string;
 }
 
 export interface RsvpResponse {
   id: string;
   guest_id: string;
   attending: boolean;
-  plus_one_attending: boolean;
+  plus_one_name: string | null;
   dietary_restrictions: string | null;
-  created_at: string;
+  message: string | null;
+  responded_at: string;
 }
 
 interface AuthContextType {
@@ -48,7 +48,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (code: string) => Promise<boolean>;
   logout: () => void;
-  submitRsvp: (attending: boolean, plusOneAttending: boolean, dietary?: string) => Promise<boolean>;
+  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   const login = async (code: string): Promise<boolean> => {
-    const { data: guestData } = await supabase
+    const { data: guestData, error } = await supabase
       .from("guests")
       .select("*")
       .ilike("code", code.trim())
@@ -144,10 +144,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const submitRsvp = async (
     attending: boolean,
-    plusOneAttending: boolean,
-    dietary?: string
+    plusOneName?: string,
+    dietary?: string,
+    message?: string
   ): Promise<boolean> => {
     if (!guest) return false;
+
+    console.log("[v0] Submitting RSVP for guest:", guest.id, { attending, plusOneName, dietary, message });
 
     // Check if RSVP already exists
     const { data: existingRsvp } = await supabase
@@ -156,19 +159,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq("guest_id", guest.id)
       .single();
 
+    console.log("[v0] Existing RSVP check:", existingRsvp);
+
     if (existingRsvp) {
       // Update existing RSVP
       const { data, error } = await supabase
         .from("rsvp_responses")
         .update({
           attending,
-          plus_one_attending: plusOneAttending,
+          plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
+          message: message || null,
         })
         .eq("guest_id", guest.id)
         .select()
         .single();
 
+      console.log("[v0] Update RSVP result - data:", data, "error:", error);
       if (error) return false;
       setRsvpResponse(data);
     } else {
@@ -178,12 +185,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .insert({
           guest_id: guest.id,
           attending,
-          plus_one_attending: plusOneAttending,
+          plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
+          message: message || null,
         })
         .select()
         .single();
 
+      console.log("[v0] Insert RSVP result - data:", data, "error:", error);
       if (error) return false;
       setRsvpResponse(data);
     }

@@ -5,11 +5,8 @@ import { useAuth } from "@/lib/auth-context";
 export function HeroSection() {
   const { weddingDetails } = useAuth();
 
-  const coupleName = weddingDetails
-    ? `${weddingDetails.couple_name_1} & ${weddingDetails.couple_name_2}`
-    : "Our Wedding";
-
-  const date = weddingDetails?.date ?? "";
+  const coupleName = weddingDetails?.couple_names ?? "Our Wedding";
+  const date = weddingDetails?.wedding_date ?? "";
 
   return (
     <section className="relative min-h-screen md:min-h-[70vh] flex items-center justify-center overflow-hidden">
@@ -54,7 +51,7 @@ export function HeroSection() {
         </p>
 
         <p className="mt-12 text-sm text-white/70 max-w-md mx-auto leading-relaxed">
-          Introduce tu codigo personal para ver los detalles el evento y confirmar tu asistencia.
+          Introduce tu código personal para ver los detalles el evento y confirmar tu asistencia.
         </p>
       </div>
     </section>

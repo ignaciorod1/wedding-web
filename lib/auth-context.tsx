@@ -164,14 +164,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     message?: string,
     needsBus?: boolean
   ): Promise<boolean> => {
-    if (!guest) return false;
+    if (!guest) {
+      console.log("[v0] submitRsvp: No guest found");
+      return false;
+    }
+
+    console.log("[v0] submitRsvp called with:", { attending, plusOneName, dietary, message, needsBus, guestId: guest.id });
 
     // Check if RSVP already exists
-    const { data: existingRsvp } = await supabase
+    const { data: existingRsvp, error: checkError } = await supabase
       .from("rsvp_responses")
       .select("*")
       .eq("guest_id", guest.id)
       .single();
+
+    console.log("[v0] Existing RSVP check:", { existingRsvp, checkError });
 
     if (existingRsvp) {
       // Update existing RSVP
@@ -189,7 +196,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select()
         .single();
 
-      if (error) return false;
+      console.log("[v0] Update RSVP result:", { data, error });
+      if (error) {
+        console.log("[v0] Update RSVP error:", error);
+        return false;
+      }
       setRsvpResponse(data);
     } else {
       // Create new RSVP
@@ -207,7 +218,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select()
         .single();
 
-      if (error) return false;
+      console.log("[v0] Insert RSVP result:", { data, error });
+      if (error) {
+        console.log("[v0] Insert RSVP error:", error);
+        return false;
+      }
       setRsvpResponse(data);
     }
 

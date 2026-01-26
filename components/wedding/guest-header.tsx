@@ -3,9 +3,11 @@
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function GuestHeader() {
   const { guest, logout } = useAuth();
+  const { t } = useLanguage();
 
   if (!guest) return null;
 
@@ -18,7 +20,7 @@ export function GuestHeader() {
           </div>
           <div>
             <p className="text-sm font-medium text-foreground">{guest.name}</p>
-            <p className="text-xs text-muted-foreground">Guest</p>
+            <p className="text-xs text-muted-foreground">{t("header.guest")}</p>
           </div>
         </div>
         <Button
@@ -28,7 +30,7 @@ export function GuestHeader() {
           className="text-muted-foreground hover:text-foreground"
         >
           <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
+          {t("header.signOut")}
         </Button>
       </div>
     </div>

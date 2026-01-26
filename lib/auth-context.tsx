@@ -12,7 +12,6 @@ import { createClient } from "@/lib/supabase/client";
 export interface Guest {
   id: string;
   name: string;
-  email: string | null;
   code: string;
   plus_one_allowed: boolean;
   created_at: string;
@@ -29,15 +28,31 @@ export interface WeddingDetails {
   reception_venue: string;
   reception_address: string;
   dress_code: string;
+  // Bus pickup details
+  bus_pickup_time: string;
+  bus_pickup_location: string;
+  bus_pickup_maps_url: string;
+  bus_pickup_arrival_time: string;
+  bus_pickup_arrival_location: string;
+  bus_pickup_arrival_maps_url: string;
+  // Bus dropoff details
+  bus_dropoff_time: string;
+  bus_dropoff_location: string;
+  bus_dropoff_maps_url: string;
+  bus_dropoff_arrival_time: string;
+  bus_dropoff_arrival_location: string;
+  bus_dropoff_arrival_maps_url: string;
 }
 
 export interface RsvpResponse {
   id: string;
   guest_id: string;
+  guest_name: string;
   attending: boolean;
   plus_one_name: string | null;
   dietary_restrictions: string | null;
   message: string | null;
+  needs_bus: boolean;
   responded_at: string;
 }
 
@@ -48,7 +63,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (code: string) => Promise<boolean>;
   logout: () => void;
-  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string) => Promise<boolean>;
+  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string, needsBus?: boolean) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -146,37 +161,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     attending: boolean,
     plusOneName?: string,
     dietary?: string,
-    message?: string
+    message?: string,
+    needsBus?: boolean
   ): Promise<boolean> => {
-    if (!guest) return false;
+    if (!guest) {
+      console.log("[v0] submitRsvp: No guest found");
+      return false;
+    }
 
-    console.log("[v0] Submitting RSVP for guest:", guest.id, { attending, plusOneName, dietary, message });
+    console.log("[v0] submitRsvp called with:", { attending, plusOneName, dietary, message, needsBus, guestId: guest.id });
 
     // Check if RSVP already exists
-    const { data: existingRsvp } = await supabase
+    const { data: existingRsvp, error: checkError } = await supabase
       .from("rsvp_responses")
       .select("*")
       .eq("guest_id", guest.id)
       .single();
 
-    console.log("[v0] Existing RSVP check:", existingRsvp);
+    console.log("[v0] Existing RSVP check:", { existingRsvp, checkError });
 
     if (existingRsvp) {
       // Update existing RSVP
       const { data, error } = await supabase
         .from("rsvp_responses")
         .update({
+          guest_name: guest.name,
           attending,
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
           message: message || null,
+          needs_bus: needsBus || false,
         })
         .eq("guest_id", guest.id)
         .select()
         .single();
 
-      console.log("[v0] Update RSVP result - data:", data, "error:", error);
-      if (error) return false;
+      console.log("[v0] Update RSVP result:", { data, error });
+      if (error) {
+        console.log("[v0] Update RSVP error:", error);
+        return false;
+      }
       setRsvpResponse(data);
     } else {
       // Create new RSVP
@@ -184,16 +208,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from("rsvp_responses")
         .insert({
           guest_id: guest.id,
+          guest_name: guest.name,
           attending,
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
           message: message || null,
+          needs_bus: needsBus || false,
         })
         .select()
         .single();
 
-      console.log("[v0] Insert RSVP result - data:", data, "error:", error);
-      if (error) return false;
+      console.log("[v0] Insert RSVP result:", { data, error });
+      if (error) {
+        console.log("[v0] Insert RSVP error:", error);
+        return false;
+      }
       setRsvpResponse(data);
     }
 

@@ -5,8 +5,7 @@
 create table if not exists public.guests (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  email text,
-  invitation_code text unique not null,
+  code text unique not null,
   plus_one_allowed boolean default false,
   created_at timestamp with time zone default now()
 );
@@ -17,10 +16,12 @@ create table if not exists public.guests (
 create table if not exists public.rsvp_responses (
   id uuid primary key default gen_random_uuid(),
   guest_id uuid not null references public.guests(id) on delete cascade,
+  guest_name text not null,
   attending boolean not null,
   plus_one_name text,
   dietary_restrictions text,
   message text,
+  needs_bus boolean default false,
   responded_at timestamp with time zone default now(),
   unique(guest_id)
 );
@@ -36,7 +37,21 @@ create table if not exists public.wedding_details (
   reception_time text not null default '6:00 PM',
   reception_venue text not null default 'The Grand Ballroom',
   reception_address text not null default '456 Celebration Ave, Beverly Hills, CA 90210',
-  dress_code text not null default 'Black Tie Optional'
+  dress_code text not null default 'Black Tie Optional',
+  -- Bus pickup details
+  bus_pickup_time text not null default '18:00',
+  bus_pickup_location text not null default 'Street A',
+  bus_pickup_maps_url text not null default 'https://maps.google.com/?q=Street+A',
+  bus_pickup_arrival_time text not null default '18:30',
+  bus_pickup_arrival_location text not null default 'Wedding Venue',
+  bus_pickup_arrival_maps_url text not null default 'https://maps.google.com/?q=Wedding+Venue',
+  -- Bus dropoff details
+  bus_dropoff_time text not null default '06:00',
+  bus_dropoff_location text not null default 'Wedding Venue',
+  bus_dropoff_maps_url text not null default 'https://maps.google.com/?q=Wedding+Venue',
+  bus_dropoff_arrival_time text not null default '06:30',
+  bus_dropoff_arrival_location text not null default 'Hotel',
+  bus_dropoff_arrival_maps_url text not null default 'https://maps.google.com/?q=Hotel'
 );
 
 -- Insert default wedding details (you can update this in the Supabase dashboard)
@@ -68,10 +83,10 @@ create policy "Allow public to read wedding_details" on public.wedding_details
   for select using (true);
 
 -- Insert some example guests (you can delete these and add your own)
-insert into public.guests (name, email, invitation_code, plus_one_allowed) values
-  ('John Smith', 'john@example.com', 'JOHN2025', true),
-  ('Sarah Johnson', 'sarah@example.com', 'SARAH2025', true),
-  ('Mike Williams', 'mike@example.com', 'MIKE2025', false),
-  ('Emily Brown', 'emily@example.com', 'EMILY2025', true),
-  ('David Miller', 'david@example.com', 'DAVID2025', false)
-on conflict (invitation_code) do nothing;
+insert into public.guests (name, code, plus_one_allowed) values
+  ('John Smith', 'JOHN2025', true),
+  ('Sarah Johnson', 'SARAH2025', true),
+  ('Mike Williams', 'MIKE2025', false),
+  ('Emily Brown', 'EMILY2025', true),
+  ('David Miller', 'DAVID2025', false)
+on conflict (code) do nothing;

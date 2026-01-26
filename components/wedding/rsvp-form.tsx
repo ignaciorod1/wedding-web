@@ -13,8 +13,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, XCircle, Heart, Users } from "lucide-react";
+import { CheckCircle2, XCircle, Heart, Users, Bus } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { BusSchedule } from "@/components/wedding/bus-schedule";
 
 export function RSVPForm() {
   const { guest, weddingDetails, rsvpResponse, submitRsvp } = useAuth();
@@ -26,6 +27,7 @@ export function RSVPForm() {
     rsvpResponse?.dietary_restrictions ?? ""
   );
   const [message, setMessage] = useState(rsvpResponse?.message ?? "");
+  const [needsBus, setNeedsBus] = useState(rsvpResponse?.needs_bus ?? false);
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
 
   if (!guest || !weddingDetails) return null;
@@ -37,7 +39,8 @@ export function RSVPForm() {
       attending,
       attending && plusOneName ? plusOneName : undefined,
       dietaryRestrictions || undefined,
-      message || undefined
+      message || undefined,
+      attending && needsBus ? needsBus : false
     );
 
     if (success) {
@@ -64,6 +67,8 @@ export function RSVPForm() {
                     Thank you for confirming your attendance, {guest.name}.
                     {rsvpResponse.plus_one_name &&
                       ` We've noted that you'll be bringing ${rsvpResponse.plus_one_name}.`}
+                    {rsvpResponse.needs_bus &&
+                      ` We've reserved a spot for you on the shuttle bus.`}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Mark your calendar for {weddingDetails.wedding_date}
@@ -162,6 +167,32 @@ export function RSVPForm() {
                 className="resize-none"
                 rows={2}
               />
+            </div>
+
+            {/* Bus Service Section */}
+            <div className="space-y-4 p-5 bg-secondary/50 rounded-lg border border-border/50">
+              <div className="flex items-center gap-2 justify-center mb-2">
+                <Bus className="w-5 h-5 text-primary" />
+                <h4 className="font-serif text-lg text-foreground">
+                  Shuttle Bus Service
+                </h4>
+              </div>
+              <p className="text-xs text-center text-muted-foreground mb-4">
+                We are providing complimentary shuttle bus service for our guests.
+              </p>
+
+              <BusSchedule weddingDetails={weddingDetails} />
+
+              <div className="flex items-center justify-center gap-2 pt-4 border-t border-border/50">
+                <Checkbox
+                  id="needsBus"
+                  checked={needsBus}
+                  onCheckedChange={(checked) => setNeedsBus(checked === true)}
+                />
+                <Label htmlFor="needsBus" className="text-sm cursor-pointer">
+                  {"Yes, I'd like to use the shuttle bus service"}
+                </Label>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">

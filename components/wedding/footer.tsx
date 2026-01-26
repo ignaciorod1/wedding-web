@@ -2,15 +2,17 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { Heart } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function Footer() {
   const { weddingDetails } = useAuth();
+  const { t } = useLanguage();
 
   const name1 = weddingDetails?.couple_name_1 ?? "";
   const name2 = weddingDetails?.couple_name_2 ?? "";
 
   const coupleName =
-    name1 && name2 ? `${name1} & ${name2}` : "Our Wedding";
+    name1 && name2 ? `${name1} & ${name2}` : t("defaults.weddingTitle");
 
   const date = weddingDetails?.date ?? "";
 
@@ -32,7 +34,7 @@ export function Footer() {
           <p className="text-sm text-white/80">{date}</p>
 
           <p className="text-xs text-white/70 mt-6">
-            With love and excitement, we look forward to celebrating with you.
+            {t("footer.message")}
           </p>
         </div>
       </div>

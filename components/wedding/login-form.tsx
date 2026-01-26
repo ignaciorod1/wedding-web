@@ -15,23 +15,23 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, KeyRound } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function LoginForm() {
   const [code, setCode] = useState("");
-  const [error, setError] = useState("");
+  const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault();      
+    setHasError(false);
     setIsLoading(true);
 
     const success = await login(code.trim());
     if (!success) {
-      setError(
-        "Invalid invitation code. Please check your invitation and try again."
-      );
+      setHasError(true);
     }
     setIsLoading(false);
   };
@@ -44,37 +44,37 @@ export function LoginForm() {
             <div className="mx-auto w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
               <KeyRound className="w-6 h-6 text-primary" />
             </div>
-            <CardTitle className="font-serif text-2xl font-normal">
-              Guest Login
-            </CardTitle>
+              <CardTitle className="font-serif text-2xl font-normal">
+              {t("login.title")}
+              </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Enter your personal invitation code to access event details
+              {t("login.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="code" className="text-sm font-medium">
-                  Invitation Code
+                  {t("login.label")}
                 </Label>
                 <Input
                   id="code"
                   type="text"
-                  placeholder="e.g., SMITH2025"
+                  placeholder={t("login.placeholder")}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   className="h-12 text-center tracking-widest uppercase bg-background"
                   required
                 />
                 <p className="text-xs text-muted-foreground text-center">
-                  You can find your code on your printed invitation
+                  {t("login.helper")}
                 </p>
               </div>
 
-              {error && (
+              {hasError && (
                 <div className="flex items-center gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <p>{error}</p>
+                  <p>{t("login.invalid")}</p>
                 </div>
               )}
 
@@ -83,7 +83,7 @@ export function LoginForm() {
                 className="w-full h-12 text-base"
                 disabled={isLoading || !code.trim()}
               >
-                {isLoading ? "Verifying..." : "Access Event Details"}
+                {isLoading ? t("login.verifying") : t("login.submit")}
               </Button>
             </form>
           </CardContent>

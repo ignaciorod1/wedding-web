@@ -3,9 +3,11 @@
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Clock, CalendarDays, Shirt } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function EventDetails() {
   const { guest, weddingDetails } = useAuth();
+  const { t } = useLanguage();
 
   if (!guest || !weddingDetails) return null;
 
@@ -14,10 +16,10 @@ export function EventDetails() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-sm tracking-[0.2em] uppercase text-muted-foreground mb-2">
-            Event Information
+            {t("event.kicker")}
           </p>
           <h2 className="font-serif text-4xl md:text-5xl font-light text-foreground">
-            Ceremony & Reception
+            {t("event.title")}
           </h2>
         </div>
 
@@ -29,7 +31,7 @@ export function EventDetails() {
                 <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
                   <CalendarDays className="w-5 h-5 text-accent" />
                 </div>
-                The Ceremony
+                {t("event.ceremony")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -63,7 +65,7 @@ export function EventDetails() {
                 <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-accent" />
                 </div>
-                The Reception
+                {t("event.reception")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -71,7 +73,7 @@ export function EventDetails() {
                 <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium text-foreground">
-                    Following the ceremony
+                    {t("event.following")}
                   </p>
                   <p className="text-muted-foreground">
                     {weddingDetails.reception_time}
@@ -98,7 +100,7 @@ export function EventDetails() {
           <CardContent className="flex items-center justify-center gap-4 py-6">
             <Shirt className="w-5 h-5 text-accent" />
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Dress Code</p>
+              <p className="text-sm text-muted-foreground">{t("event.dressCode")}</p>
               <p className="font-medium text-foreground">
                 {weddingDetails.dress_code}
               </p>

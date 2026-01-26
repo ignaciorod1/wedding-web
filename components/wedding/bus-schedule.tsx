@@ -1,37 +1,122 @@
 "use client";
 
-import { Bus, MapPin, Calendar, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Bus, MapPin, ExternalLink } from "lucide-react";
 import type { WeddingDetails } from "@/lib/auth-context";
+import { useLanguage } from "@/lib/i18n";
 
 interface BusScheduleProps {
   weddingDetails: WeddingDetails;
 }
 
 // Helper function to generate Google Calendar URL
-function generateGoogleCalendarUrl(
+function parseDateString(dateStr: string, timeStr: string) {
+  const trimmed = dateStr.trim();
+  if (!trimmed) return null;
+
+  const monthMap: Record<string, number> = {
+    january: 0,
+    february: 1,
+    march: 2,
+    april: 3,
+    may: 4,
+    june: 5,
+    july: 6,
+    august: 7,
+    september: 8,
+    october: 9,
+    november: 10,
+    december: 11,
+    enero: 0,
+    febrero: 1,
+    marzo: 2,
+    abril: 3,
+    mayo: 4,
+    junio: 5,
+    julio: 6,
+    agosto: 7,
+    septiembre: 8,
+    octubre: 9,
+    noviembre: 10,
+    diciembre: 11,
+    januar: 0,
+    februar: 1,
+    maerz: 2,
+    märz: 2,
+    april_de: 3,
+    mai: 4,
+    juni: 5,
+    juli: 6,
+    august_de: 7,
+    september_de: 8,
+    oktober: 9,
+    november_de: 10,
+    dezember: 11,
+  };
+
+  const normalized = trimmed
+    .toLowerCase()
+    .replace(/[.,]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(" de ", " ")
+    .trim();
+
+  const parts = normalized.split(" ");
+  let day = 0;
+  let month: number | undefined;
+  let year = 0;
+
+  if (parts.length >= 3) {
+    if (/^\d{1,2}$/.test(parts[0])) {
+      day = Number(parts[0]);
+      month = monthMap[parts[1]];
+      year = Number(parts[2]);
+    } else if (/^\d{1,2}$/.test(parts[1])) {
+      month = monthMap[parts[0]];
+      day = Number(parts[1]);
+      year = Number(parts[2]);
+    }
+  }
+
+  if (!day || month === undefined || !year) {
+    const fallback = new Date(trimmed);
+    if (Number.isNaN(fallback.getTime())) return null;
+    const [hour, minute] = parseTime(timeStr);
+    fallback.setHours(hour, minute, 0, 0);
+    return fallback;
+  }
+
+  const [hour, minute] = parseTime(timeStr);
+  return new Date(year, month, day, hour, minute, 0, 0);
+}
+
+function parseTime(timeStr: string) {
+  const [rawHour, rawMinute] = timeStr.split(":");
+  const hour = Number(rawHour);
+  const minute = Number(rawMinute);
+  return [
+    Number.isFinite(hour) ? hour : 0,
+    Number.isFinite(minute) ? minute : 0,
+  ];
+}
+
+export function generateGoogleCalendarUrl(
   title: string,
   description: string,
   location: string,
   startDate: string,
   startTime: string,
   endTime: string
-): string {
-  // Parse the wedding date and times
-  // Assuming wedding_date is like "June 15, 2025" and times are like "18:00"
+): string | null {
   const safeStartDate = startDate || "June 15, 2025";
   const safeStartTime = startTime || "18:00";
   const safeEndTime = endTime || "19:00";
-  
-  const eventDate = new Date(safeStartDate);
-  const [startHour, startMin] = safeStartTime.split(":").map(Number);
-  const [endHour, endMin] = safeEndTime.split(":").map(Number);
 
-  const start = new Date(eventDate);
-  start.setHours(startHour, startMin, 0);
+  const start = parseDateString(safeStartDate, safeStartTime);
+  const end = parseDateString(safeStartDate, safeEndTime);
 
-  const end = new Date(eventDate);
-  end.setHours(endHour, endMin, 0);
+  if (!start || !end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null;
+  }
 
   // If end time is before start time, assume it's the next day
   if (end < start) {
@@ -53,27 +138,24 @@ function generateGoogleCalendarUrl(
 }
 
 // Helper function to generate ICS file for Apple Calendar
-function generateICSFile(
+export function generateICSFile(
   title: string,
   description: string,
   location: string,
   startDate: string,
   startTime: string,
   endTime: string
-): string {
+): string | null {
   const safeStartDate = startDate || "June 15, 2025";
   const safeStartTime = startTime || "18:00";
   const safeEndTime = endTime || "19:00";
-  
-  const eventDate = new Date(safeStartDate);
-  const [startHour, startMin] = safeStartTime.split(":").map(Number);
-  const [endHour, endMin] = safeEndTime.split(":").map(Number);
 
-  const start = new Date(eventDate);
-  start.setHours(startHour, startMin, 0);
+  const start = parseDateString(safeStartDate, safeStartTime);
+  const end = parseDateString(safeStartDate, safeEndTime);
 
-  const end = new Date(eventDate);
-  end.setHours(endHour, endMin, 0);
+  if (!start || !end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null;
+  }
 
   if (end < start) {
     end.setDate(end.getDate() + 1);
@@ -135,6 +217,60 @@ function BusIcon() {
   );
 }
 
+export function getBusDetails(
+  weddingDetails?: WeddingDetails,
+  defaults?: Partial<WeddingDetails>
+) {
+  return {
+    couple_names:
+      weddingDetails?.couple_names ||
+      defaults?.couple_names ||
+      "La pareja",
+    wedding_date:
+      weddingDetails?.wedding_date ||
+      defaults?.wedding_date ||
+      "June 15, 2025",
+    ceremony_venue:
+      weddingDetails?.ceremony_venue ||
+      defaults?.ceremony_venue ||
+      "Lugar de la boda",
+    ceremony_time:
+      weddingDetails?.ceremony_time || defaults?.ceremony_time || "16:00",
+    bus_pickup_time:
+      weddingDetails?.bus_pickup_time || defaults?.bus_pickup_time || "18:00",
+    bus_pickup_location:
+      weddingDetails?.bus_pickup_location ||
+      defaults?.bus_pickup_location ||
+      "Lugar de recogida",
+    bus_pickup_maps_url: weddingDetails?.bus_pickup_maps_url || "#",
+    bus_pickup_arrival_time:
+      weddingDetails?.bus_pickup_arrival_time ||
+      defaults?.bus_pickup_arrival_time ||
+      "18:30",
+    bus_pickup_arrival_location:
+      weddingDetails?.bus_pickup_arrival_location ||
+      defaults?.bus_pickup_arrival_location ||
+      "Lugar de la boda",
+    bus_pickup_arrival_maps_url: weddingDetails?.bus_pickup_arrival_maps_url || "#",
+    bus_dropoff_time:
+      weddingDetails?.bus_dropoff_time || defaults?.bus_dropoff_time || "06:00",
+    bus_dropoff_location:
+      weddingDetails?.bus_dropoff_location ||
+      defaults?.bus_dropoff_location ||
+      "Lugar de la boda",
+    bus_dropoff_maps_url: weddingDetails?.bus_dropoff_maps_url || "#",
+    bus_dropoff_arrival_time:
+      weddingDetails?.bus_dropoff_arrival_time ||
+      defaults?.bus_dropoff_arrival_time ||
+      "06:30",
+    bus_dropoff_arrival_location:
+      weddingDetails?.bus_dropoff_arrival_location ||
+      defaults?.bus_dropoff_arrival_location ||
+      "Hotel",
+    bus_dropoff_arrival_maps_url: weddingDetails?.bus_dropoff_arrival_maps_url || "#",
+  };
+}
+
 function ScheduleRow({
   title,
   startTime,
@@ -143,7 +279,6 @@ function ScheduleRow({
   endTime,
   endLocation,
   endMapsUrl,
-  weddingDate,
 }: {
   title: string;
   startTime: string;
@@ -152,26 +287,7 @@ function ScheduleRow({
   endTime: string;
   endLocation: string;
   endMapsUrl: string;
-  weddingDate: string;
 }) {
-  const googleCalendarUrl = generateGoogleCalendarUrl(
-    `Wedding Shuttle - ${title}`,
-    `Shuttle bus service for the wedding. From ${startLocation} to ${endLocation}.`,
-    startLocation,
-    weddingDate,
-    startTime,
-    endTime
-  );
-
-  const icsFileUrl = generateICSFile(
-    `Wedding Shuttle - ${title}`,
-    `Shuttle bus service for the wedding. From ${startLocation} to ${endLocation}.`,
-    startLocation,
-    weddingDate,
-    startTime,
-    endTime
-  );
-
   return (
     <div className="space-y-4">
       <h4 className="font-serif text-xl text-center text-foreground">{title}</h4>
@@ -199,88 +315,33 @@ function ScheduleRow({
           />
         </div>
       </div>
-
-      {/* Calendar buttons */}
-      <div className="flex items-center justify-center gap-2 pt-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs h-8 gap-1.5 text-muted-foreground hover:text-foreground"
-          asChild
-        >
-          <a href={googleCalendarUrl} target="_blank" rel="noopener noreferrer">
-            <Calendar className="w-3.5 h-3.5" />
-            Google
-          </a>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs h-8 gap-1.5 text-muted-foreground hover:text-foreground"
-          asChild
-        >
-          <a href={icsFileUrl} download={`shuttle-${title.toLowerCase().replace(/\s+/g, "-")}.ics`}>
-            <Calendar className="w-3.5 h-3.5" />
-            Apple
-          </a>
-        </Button>
-      </div>
     </div>
   );
 }
 
 export function BusSchedule({ weddingDetails }: BusScheduleProps) {
   // Safe defaults for wedding details
-  const details = {
-    couple_names: weddingDetails?.couple_names || "The Couple",
-    wedding_date: weddingDetails?.wedding_date || "June 15, 2025",
-    ceremony_venue: weddingDetails?.ceremony_venue || "Wedding Venue",
-    ceremony_time: weddingDetails?.ceremony_time || "16:00",
-    bus_pickup_time: weddingDetails?.bus_pickup_time || "18:00",
-    bus_pickup_location: weddingDetails?.bus_pickup_location || "Pickup Location",
-    bus_pickup_maps_url: weddingDetails?.bus_pickup_maps_url || "#",
-    bus_pickup_arrival_time: weddingDetails?.bus_pickup_arrival_time || "18:30",
-    bus_pickup_arrival_location: weddingDetails?.bus_pickup_arrival_location || "Wedding Venue",
-    bus_pickup_arrival_maps_url: weddingDetails?.bus_pickup_arrival_maps_url || "#",
-    bus_dropoff_time: weddingDetails?.bus_dropoff_time || "06:00",
-    bus_dropoff_location: weddingDetails?.bus_dropoff_location || "Wedding Venue",
-    bus_dropoff_maps_url: weddingDetails?.bus_dropoff_maps_url || "#",
-    bus_dropoff_arrival_time: weddingDetails?.bus_dropoff_arrival_time || "06:30",
-    bus_dropoff_arrival_location: weddingDetails?.bus_dropoff_arrival_location || "Hotel",
-    bus_dropoff_arrival_maps_url: weddingDetails?.bus_dropoff_arrival_maps_url || "#",
-  };
-
-  // Wedding event calendar URLs
-  const weddingGoogleCalendarUrl = generateGoogleCalendarUrl(
-    `${details.couple_names} Wedding`,
-    `Wedding ceremony and reception`,
-    details.ceremony_venue,
-    details.wedding_date,
-    details.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
-    "23:00"
-  );
-
-  const weddingIcsFileUrl = generateICSFile(
-    `${details.couple_names} Wedding`,
-    `Wedding ceremony and reception`,
-    details.ceremony_venue,
-    details.wedding_date,
-    details.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
-    "23:00"
-  );
+  const { t } = useLanguage();
+  const details = getBusDetails(weddingDetails, {
+    couple_names: t("defaults.couple"),
+    ceremony_venue: t("defaults.venue"),
+    bus_pickup_location: t("defaults.pickupLocation"),
+    bus_pickup_arrival_location: t("defaults.pickupArrivalLocation"),
+    bus_dropoff_location: t("defaults.dropoffLocation"),
+    bus_dropoff_arrival_location: t("defaults.dropoffArrivalLocation"),
+  });
 
   return (
     <div className="space-y-6">
       {/* Pickup Schedule */}
       <ScheduleRow
-        title="Pickup"
+        title={t("bus.pickup")}
         startTime={details.bus_pickup_time}
         startLocation={details.bus_pickup_location}
         startMapsUrl={details.bus_pickup_maps_url}
         endTime={details.bus_pickup_arrival_time}
         endLocation={details.bus_pickup_arrival_location}
         endMapsUrl={details.bus_pickup_arrival_maps_url}
-        weddingDate={details.wedding_date}
       />
 
       {/* Divider */}
@@ -288,46 +349,14 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
 
       {/* Dropoff Schedule */}
       <ScheduleRow
-        title="Drop off"
+        title={t("bus.dropoff")}
         startTime={details.bus_dropoff_time}
         startLocation={details.bus_dropoff_location}
         startMapsUrl={details.bus_dropoff_maps_url}
         endTime={details.bus_dropoff_arrival_time}
         endLocation={details.bus_dropoff_arrival_location}
         endMapsUrl={details.bus_dropoff_arrival_maps_url}
-        weddingDate={details.wedding_date}
       />
-
-      {/* Wedding Event Calendar */}
-      <div className="border-t border-border/50 pt-4">
-        <p className="text-xs text-center text-muted-foreground mb-2">
-          Add the wedding to your calendar
-        </p>
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs h-8 gap-1.5 bg-transparent"
-            asChild
-          >
-            <a href={weddingGoogleCalendarUrl} target="_blank" rel="noopener noreferrer">
-              <Calendar className="w-3.5 h-3.5" />
-              Google Calendar
-            </a>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs h-8 gap-1.5 bg-transparent"
-            asChild
-          >
-            <a href={weddingIcsFileUrl} download="wedding.ics">
-              <Calendar className="w-3.5 h-3.5" />
-              Apple Calendar
-            </a>
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

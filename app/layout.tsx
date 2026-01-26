@@ -17,8 +17,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Our Wedding - Join Us',
-  description: 'You are invited to celebrate our special day',
+  title: 'Nuestra boda - Acompáñanos',
+  description: 'Estás invitado a celebrar nuestro día especial',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${cormorant.variable} ${montserrat.variable} font-sans antialiased`}>
         {children}
         <Analytics />

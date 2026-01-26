@@ -28,6 +28,7 @@ export interface WeddingDetails {
   reception_venue: string;
   reception_address: string;
   dress_code: string;
+  iban?: string | null;
   // Bus pickup details
   bus_pickup_time: string;
   bus_pickup_location: string;

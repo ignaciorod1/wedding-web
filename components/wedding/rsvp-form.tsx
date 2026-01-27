@@ -93,8 +93,8 @@ export function RSVPForm() {
       t("calendar.weddingDetails"),
       busDetails.ceremony_venue,
       busDetails.wedding_date,
-      busDetails.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
-      "23:00"
+      busDetails.reception_time?.replace(/[^0-9:]/g, "") || "16:00",
+      busDetails.end_time?.replace(/[^0-9:]/g, "") || "23:00"
     );
 
     const weddingIcsFileUrl = generateICSFile(
@@ -102,15 +102,15 @@ export function RSVPForm() {
       t("calendar.weddingDetails"),
       busDetails.ceremony_venue,
       busDetails.wedding_date,
-      busDetails.ceremony_time.replace(/[^0-9:]/g, "") || "16:00",
-      "23:00"
+      busDetails.reception_time?.replace(/[^0-9:]/g, "") || "16:00",
+      busDetails.end_time?.replace(/[^0-9:]/g, "") || "23:00"
     );
 
     const shuttleGoogleCalendarUrl = generateGoogleCalendarUrl(
       t("calendar.busTitle", { label: t("bus.pickup") }),
       t("calendar.busDetails", {
         from: busDetails.bus_pickup_location,
-        to: busDetails.bus_pickup_arrival_location,
+        to: busDetails.ceremony_venue,
       }),
       busDetails.bus_pickup_location,
       busDetails.wedding_date,
@@ -122,7 +122,7 @@ export function RSVPForm() {
       t("calendar.busTitle", { label: t("bus.pickup") }),
       t("calendar.busDetails", {
         from: busDetails.bus_pickup_location,
-        to: busDetails.bus_pickup_arrival_location,
+        to: busDetails.ceremony_venue,
       }),
       busDetails.bus_pickup_location,
       busDetails.wedding_date,
@@ -152,88 +152,27 @@ export function RSVPForm() {
                     {rsvpResponse.needs_bus &&
                       ` ${t("rsvp.confirmBus")}`}
                   </p>
+                  {rsvpResponse.needs_bus && (
+                    <p className="text-sm text-muted-foreground">
+                      {t("rsvp.confirmBusDetails", {
+                        time: busDetails.bus_pickup_time,
+                        location: busDetails.bus_pickup_location,
+                      })}{" "}
+                      <a
+                        href={busDetails.bus_pickup_maps_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline underline-offset-2"
+                      >
+                        {t("hotel.google")}
+                      </a>
+                    </p>
+                  )}
                   <p className="text-sm text-muted-foreground">
                     {t("rsvp.confirmDate", {
                       date: weddingDetails.wedding_date,
                     })}
                   </p>
-                  <div className="mt-5 space-y-3">
-                    {weddingGoogleCalendarUrl && weddingIcsFileUrl && (
-                      <div className="flex flex-col items-center gap-2">
-                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                          {t("rsvp.addWedding")}
-                        </p>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-xs h-8 gap-1.5 bg-transparent"
-                            asChild
-                          >
-                            <a
-                              href={weddingGoogleCalendarUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Calendar className="w-3.5 h-3.5" />
-                              {t("calendar.google")}
-                            </a>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-xs h-8 gap-1.5 bg-transparent"
-                            asChild
-                          >
-                            <a href={weddingIcsFileUrl} download="wedding.ics">
-                              <Calendar className="w-3.5 h-3.5" />
-                              {t("calendar.apple")}
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                    {rsvpResponse.needs_bus &&
-                      shuttleGoogleCalendarUrl &&
-                      shuttleIcsFileUrl && (
-                        <div className="flex flex-col items-center gap-2">
-                          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                            {t("rsvp.addShuttle")}
-                          </p>
-                          <div className="flex items-center justify-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs h-8 gap-1.5 bg-transparent"
-                              asChild
-                            >
-                              <a
-                                href={shuttleGoogleCalendarUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Calendar className="w-3.5 h-3.5" />
-                                {t("calendar.google")}
-                              </a>
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs h-8 gap-1.5 bg-transparent"
-                              asChild
-                            >
-                              <a
-                                href={shuttleIcsFileUrl}
-                                download="shuttle-pickup.ics"
-                              >
-                                <Calendar className="w-3.5 h-3.5" />
-                                {t("calendar.apple")}
-                              </a>
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                  </div>
                 </>
               ) : (
                 <>
@@ -257,6 +196,90 @@ export function RSVPForm() {
               </Button>
             </CardContent>
           </Card>
+          {rsvpResponse.attending &&
+            weddingGoogleCalendarUrl &&
+            weddingIcsFileUrl && (
+              <Card className="border-border/50 text-center">
+                <CardContent className="pt-6 pb-6 space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Reserva la fecha: {weddingDetails.wedding_date}
+                  </p>
+                  <div className="flex flex-col items-center gap-2">
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                      {t("rsvp.addWedding")}
+                    </p>
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8 gap-1.5 bg-transparent"
+                        asChild
+                      >
+                        <a
+                          href={weddingGoogleCalendarUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Calendar className="w-3.5 h-3.5" />
+                          {t("calendar.google")}
+                        </a>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8 gap-1.5 bg-transparent"
+                        asChild
+                      >
+                        <a href={weddingIcsFileUrl} download="wedding.ics">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {t("calendar.apple")}
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                  {rsvpResponse.needs_bus &&
+                    shuttleGoogleCalendarUrl &&
+                    shuttleIcsFileUrl && (
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                          {t("rsvp.addShuttle")}
+                        </p>
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-8 gap-1.5 bg-transparent"
+                            asChild
+                          >
+                            <a
+                              href={shuttleGoogleCalendarUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Calendar className="w-3.5 h-3.5" />
+                              {t("calendar.google")}
+                            </a>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-8 gap-1.5 bg-transparent"
+                            asChild
+                          >
+                            <a
+                              href={shuttleIcsFileUrl}
+                              download="shuttle-pickup.ics"
+                            >
+                              <Calendar className="w-3.5 h-3.5" />
+                              {t("calendar.apple")}
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                </CardContent>
+              </Card>
+            )}
           {rsvpResponse.attending && (
             <>
               <Card className="border-border/50">
@@ -340,7 +363,7 @@ export function RSVPForm() {
                   <img
                     src="/galleta.jpg"
                     alt="Foto para regalos"
-                    className="w-full h-32 object-contain rounded-lg bg-secondary/30"
+                    className="w-full h-48 object-contain rounded-lg bg-secondary/30"
                   />
                   <p className="text-sm text-muted-foreground text-center">
                     {t("gifts.message")}

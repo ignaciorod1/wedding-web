@@ -229,11 +229,13 @@ export function getBusDetails(
     wedding_date:
       weddingDetails?.wedding_date ||
       defaults?.wedding_date ||
-      "June 15, 2025",
+      "June 6, 2026",
     ceremony_venue:
       weddingDetails?.ceremony_venue ||
       defaults?.ceremony_venue ||
       "Lugar de la boda",
+    ceremony_address:
+      weddingDetails?.ceremony_address || defaults?.ceremony_address || "",
     ceremony_time:
       weddingDetails?.ceremony_time || defaults?.ceremony_time || "16:00",
     bus_pickup_time:
@@ -247,17 +249,8 @@ export function getBusDetails(
       weddingDetails?.bus_pickup_arrival_time ||
       defaults?.bus_pickup_arrival_time ||
       "18:30",
-    bus_pickup_arrival_location:
-      weddingDetails?.bus_pickup_arrival_location ||
-      defaults?.bus_pickup_arrival_location ||
-      "Lugar de la boda",
-    bus_pickup_arrival_maps_url: weddingDetails?.bus_pickup_arrival_maps_url || "#",
     bus_dropoff_time:
       weddingDetails?.bus_dropoff_time || defaults?.bus_dropoff_time || "06:00",
-    bus_dropoff_location:
-      weddingDetails?.bus_dropoff_location ||
-      defaults?.bus_dropoff_location ||
-      "Lugar de la boda",
     bus_dropoff_maps_url: weddingDetails?.bus_dropoff_maps_url || "#",
     bus_dropoff_arrival_time:
       weddingDetails?.bus_dropoff_arrival_time ||
@@ -293,10 +286,6 @@ function ScheduleRow({
       <h4 className="font-serif text-xl text-center text-foreground">{title}</h4>
       
       <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute top-1/2 left-0 right-0 h-px bg-border -translate-y-1/2" />
-        
-        {/* Stops */}
         <div className="relative flex items-center justify-between">
           <ScheduleStop
             time={startTime}
@@ -304,9 +293,9 @@ function ScheduleRow({
             mapsUrl={startMapsUrl}
             isStart={true}
           />
-          
+
           <BusIcon />
-          
+
           <ScheduleStop
             time={endTime}
             location={endLocation}
@@ -326,8 +315,6 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
     couple_names: t("defaults.couple"),
     ceremony_venue: t("defaults.venue"),
     bus_pickup_location: t("defaults.pickupLocation"),
-    bus_pickup_arrival_location: t("defaults.pickupArrivalLocation"),
-    bus_dropoff_location: t("defaults.dropoffLocation"),
     bus_dropoff_arrival_location: t("defaults.dropoffArrivalLocation"),
   });
 
@@ -340,8 +327,8 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
         startLocation={details.bus_pickup_location}
         startMapsUrl={details.bus_pickup_maps_url}
         endTime={details.bus_pickup_arrival_time}
-        endLocation={details.bus_pickup_arrival_location}
-        endMapsUrl={details.bus_pickup_arrival_maps_url}
+        endLocation={details.ceremony_venue}
+        endMapsUrl={details.bus_pickup_maps_url}
       />
 
       {/* Divider */}
@@ -351,8 +338,8 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
       <ScheduleRow
         title={t("bus.dropoff")}
         startTime={details.bus_dropoff_time}
-        startLocation={details.bus_dropoff_location}
-        startMapsUrl={details.bus_dropoff_maps_url}
+        startLocation={details.ceremony_venue}
+        startMapsUrl={details.bus_dropoff_arrival_maps_url}
         endTime={details.bus_dropoff_arrival_time}
         endLocation={details.bus_dropoff_arrival_location}
         endMapsUrl={details.bus_dropoff_arrival_maps_url}

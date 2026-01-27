@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   MapPin,
   Clock,
@@ -24,7 +25,7 @@ export function EventDetails() {
 
   return (
     <section className="py-16 px-4 bg-secondary/30">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-sm tracking-[0.2em] uppercase text-muted-foreground mb-2">
             {t("event.kicker")}
@@ -45,6 +46,11 @@ export function EventDetails() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <img
+                src="/venue.png"
+                alt="Lugar de la boda"
+                className="w-full h-40 object-contain rounded-lg bg-secondary/30"
+              />
               <div className="flex items-start gap-3">
                 <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div>
@@ -65,6 +71,20 @@ export function EventDetails() {
                   <p className="text-muted-foreground text-sm">
                     {weddingDetails.ceremony_address}
                   </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 text-xs h-8 bg-transparent"
+                    asChild
+                  >
+                    <a
+                      href="https://maps.app.goo.gl/gsuWgga7PDg3FHf79"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Google Maps
+                    </a>
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -83,14 +103,14 @@ export function EventDetails() {
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
                 {[
                   {
-                    label: t("event.scheduleCeremony"),
-                    value: weddingDetails.ceremony_time,
-                    Icon: Heart,
-                  },
-                  {
                     label: t("event.scheduleReception"),
                     value: weddingDetails.reception_time,
                     Icon: Landmark,
+                  },
+                  {
+                    label: t("event.scheduleCeremony"),
+                    value: weddingDetails.ceremony_time,
+                    Icon: Heart,
                   },
                   {
                     label: t("event.scheduleCocktail"),

@@ -73,6 +73,7 @@ const translations: Record<Language, Translations> = {
       "Hemos anotado que traerás a {plusOne}.",
     "rsvp.confirmBus":
       "Hemos reservado un lugar para ti en el autobús lanzadera.",
+    "rsvp.confirmBusDetails": "Recogida a las {time} en {location}.",
     "rsvp.confirmDate": "Reserva la fecha: {date}",
     "rsvp.addWedding": "Añadir la boda",
     "rsvp.addShuttle": "Recogida del autobús",
@@ -172,6 +173,7 @@ const translations: Record<Language, Translations> = {
     "rsvp.confirmPlusOne":
       "Mir händ notiert, dass du {plusOne} mitbringisch.",
     "rsvp.confirmBus": "Mir händ dir en Platz im Shuttle reserviert.",
+    "rsvp.confirmBusDetails": "Abfahrt um {time} bi {location}.",
     "rsvp.confirmDate": "Merk dir s'Datum: {date}",
     "rsvp.addWedding": "Boda i Kalender",
     "rsvp.addShuttle": "Shuttle-Abfahrt",

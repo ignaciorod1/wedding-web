@@ -337,15 +337,11 @@ export function RSVPForm() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-40 object-cover rounded-lg"
-                  >
-                    <source src="/wedding-gifts.mp4" type="video/mp4" />
-                  </video>
+                  <img
+                    src="/galleta.jpg"
+                    alt="Foto para regalos"
+                    className="w-full h-32 object-contain rounded-lg bg-secondary/30"
+                  />
                   <p className="text-sm text-muted-foreground text-center">
                     {t("gifts.message")}
                   </p>

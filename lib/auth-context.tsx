@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface Guest {
   id: string;
   name: string;
+  nickname?: string | null;
   code: string;
   plus_one_allowed: boolean;
   created_at: string;
@@ -53,6 +54,7 @@ export interface RsvpResponse {
   id: string;
   guest_id: string;
   guest_name: string;
+  guest_nickname: string | null;
   attending: boolean;
   plus_one_name: string | null;
   dietary_restrictions: string | null;
@@ -191,6 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from("rsvp_responses")
         .update({
           guest_name: guest.name,
+          guest_nickname: guest.nickname || null,
           attending,
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
@@ -214,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .insert({
           guest_id: guest.id,
           guest_name: guest.name,
+          guest_nickname: guest.nickname || null,
           attending,
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,

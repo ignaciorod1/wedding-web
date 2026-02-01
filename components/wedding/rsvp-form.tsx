@@ -67,6 +67,9 @@ export function RSVPForm() {
   };
 
   if (showConfirmation && rsvpResponse) {
+    const displayName = guest.nickname
+      ? `${guest.name} (${guest.nickname})`
+      : guest.name;
     const hotel = {
       name: "Hotel Cádiz Bahía",
       googleUrl: "https://maps.app.goo.gl/t4u3ver2mJzokUaj8",
@@ -144,7 +147,7 @@ export function RSVPForm() {
                     {t("rsvp.confirmTitle")}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    {t("rsvp.confirmBody", { name: guest.name })}
+                    {t("rsvp.confirmBody", { name: displayName })}
                     {rsvpResponse.plus_one_name &&
                       ` ${t("rsvp.confirmPlusOne", {
                         plusOne: rsvpResponse.plus_one_name,
@@ -183,7 +186,7 @@ export function RSVPForm() {
                     {t("rsvp.missTitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    {t("rsvp.missBody", { name: guest.name })}
+                    {t("rsvp.missBody", { name: displayName })}
                   </p>
                 </>
               )}

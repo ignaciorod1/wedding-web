@@ -74,6 +74,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const RSVP_STORAGE_KEY = "wedding-rsvp-response";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [guest, setGuest] = useState<Guest | null>(null);
@@ -82,6 +83,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const supabase = createClient();
+
+  const loadStoredRsvp = (guestId: string): RsvpResponse | null => {
+    const raw = localStorage.getItem(RSVP_STORAGE_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as RsvpResponse;
+      if (parsed && parsed.guest_id === guestId) {
+        return parsed;
+      }
+    } catch {
+      // Ignore invalid cached data
+    }
+    return null;
+  };
 
   // Fetch wedding details on mount
   useEffect(() => {
@@ -113,6 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (guestData) {
           setGuest(guestData);
+          const storedRsvp = loadStoredRsvp(savedGuestId);
+          if (storedRsvp) {
+            setRsvpResponse(storedRsvp);
+          }
           
           // Fetch existing RSVP response
           const { data: rsvpData } = await supabase
@@ -131,6 +150,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, [supabase]);
 
+  useEffect(() => {
+    if (!guest) return;
+    if (rsvpResponse) {
+      localStorage.setItem(RSVP_STORAGE_KEY, JSON.stringify(rsvpResponse));
+    } else {
+      localStorage.removeItem(RSVP_STORAGE_KEY);
+    }
+  }, [guest, rsvpResponse]);
+
   const login = async (code: string): Promise<boolean> => {
     const { data: guestData, error } = await supabase
       .from("guests")
@@ -141,6 +169,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (guestData) {
       setGuest(guestData);
       localStorage.setItem("wedding-guest-id", guestData.id);
+      const storedRsvp = loadStoredRsvp(guestData.id);
+      if (storedRsvp) {
+        setRsvpResponse(storedRsvp);
+      }
       
       // Check for existing RSVP
       const { data: rsvpData } = await supabase
@@ -162,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setGuest(null);
     setRsvpResponse(null);
     localStorage.removeItem("wedding-guest-id");
+    localStorage.removeItem(RSVP_STORAGE_KEY);
   };
 
   const submitRsvp = async (

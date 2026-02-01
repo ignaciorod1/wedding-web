@@ -239,7 +239,7 @@ export function getBusDetails(
     ceremony_time:
       weddingDetails?.ceremony_time || defaults?.ceremony_time || "16:00",
     bus_pickup_time:
-      weddingDetails?.bus_pickup_time || defaults?.bus_pickup_time || "18:00",
+      weddingDetails?.bus_pickup_time || defaults?.bus_pickup_time || "",
     bus_pickup_location:
       weddingDetails?.bus_pickup_location ||
       defaults?.bus_pickup_location ||
@@ -250,7 +250,7 @@ export function getBusDetails(
       defaults?.bus_pickup_arrival_time ||
       "18:30",
     bus_dropoff_time:
-      weddingDetails?.bus_dropoff_time || defaults?.bus_dropoff_time || "06:00",
+      weddingDetails?.bus_dropoff_time || defaults?.bus_dropoff_time || "",
     bus_dropoff_maps_url: weddingDetails?.bus_dropoff_maps_url || "#",
     bus_dropoff_arrival_time:
       weddingDetails?.bus_dropoff_arrival_time ||

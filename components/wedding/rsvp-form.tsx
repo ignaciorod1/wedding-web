@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,8 +37,17 @@ export function RSVPForm() {
   const [message, setMessage] = useState(rsvpResponse?.message ?? "");
   const [needsBus, setNeedsBus] = useState(rsvpResponse?.needs_bus ?? false);
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
+  const [showPostAcceptForm, setShowPostAcceptForm] = useState(false);
+  const [postAcceptSaved, setPostAcceptSaved] = useState(false);
+  const [isSavingPostAccept, setIsSavingPostAccept] = useState(false);
 
   if (!guest || !weddingDetails) return null;
+
+  useEffect(() => {
+    if (rsvpResponse) {
+      setShowConfirmation(true);
+    }
+  }, [rsvpResponse]);
 
   const busDetails = getBusDetails(weddingDetails, {
     couple_names: t("defaults.couple"),
@@ -62,11 +71,34 @@ export function RSVPForm() {
 
     if (success) {
       setShowConfirmation(true);
+      setShowPostAcceptForm(attending);
+      if (attending) {
+        setPostAcceptSaved(false);
+      }
     }
     setIsSubmitting(false);
   };
 
+  const handlePostAcceptSave = async () => {
+    setIsSavingPostAccept(true);
+
+    const success = await submitRsvp(
+      true,
+      plusOneName || undefined,
+      dietaryRestrictions || undefined,
+      message || undefined,
+      needsBus
+    );
+
+    if (success) {
+      setPostAcceptSaved(true);
+      window.setTimeout(() => setPostAcceptSaved(false), 2000);
+    }
+    setIsSavingPostAccept(false);
+  };
+
   if (showConfirmation && rsvpResponse) {
+    const displayName = guest.name;
     const hotel = {
       name: "Hotel Cádiz Bahía",
       googleUrl: "https://maps.app.goo.gl/t4u3ver2mJzokUaj8",
@@ -144,7 +176,7 @@ export function RSVPForm() {
                     {t("rsvp.confirmTitle")}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    {t("rsvp.confirmBody", { name: guest.name })}
+                    {t("rsvp.confirmBody", { name: displayName })}
                     {rsvpResponse.plus_one_name &&
                       ` ${t("rsvp.confirmPlusOne", {
                         plusOne: rsvpResponse.plus_one_name,
@@ -173,6 +205,90 @@ export function RSVPForm() {
                       date: weddingDetails.wedding_date,
                     })}
                   </p>
+                  <Button
+                    variant="outline"
+                    className="mt-6 bg-transparent"
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      setShowPostAcceptForm(false);
+                    }}
+                  >
+                    {t("rsvp.update")}
+                  </Button>
+                  {showPostAcceptForm && (
+                    <div className="mt-6 space-y-4 text-left">
+                      <div className="space-y-2">
+                        <Label htmlFor="dietary" className="text-sm font-medium">
+                          {t("rsvp.dietary")}
+                        </Label>
+                        <Textarea
+                          id="dietary"
+                          placeholder={t("rsvp.dietaryPlaceholder")}
+                          value={dietaryRestrictions}
+                          onChange={(e) => setDietaryRestrictions(e.target.value)}
+                          className="resize-none"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="message" className="text-sm font-medium">
+                          {t("rsvp.message")}
+                        </Label>
+                        <Textarea
+                          id="message"
+                          placeholder={t("rsvp.messagePlaceholder")}
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          className="resize-none"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
+                        <div className="flex items-center gap-2">
+                          <Bus className="w-4 h-4 text-primary" />
+                          <h4 className="font-serif text-base text-foreground">
+                            {t("rsvp.busTitle")}
+                          </h4>
+                        </div>
+                        <BusSchedule weddingDetails={weddingDetails} />
+                        <div className="pt-3 border-t border-border/50">
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <Button
+                              type="button"
+                              variant={needsBus ? "default" : "outline"}
+                              className="flex-1 h-11 gap-2"
+                              onClick={() => setNeedsBus(true)}
+                              disabled={isSavingPostAccept}
+                            >
+                              {t("rsvp.busYes")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant={!needsBus ? "default" : "outline"}
+                              className="flex-1 h-11 gap-2"
+                              onClick={() => setNeedsBus(false)}
+                              disabled={isSavingPostAccept}
+                            >
+                              {t("rsvp.busNo")}
+                            </Button>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          className="w-full h-11"
+                          onClick={handlePostAcceptSave}
+                          disabled={isSavingPostAccept}
+                        >
+                          {t("rsvp.saveChanges")}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  {postAcceptSaved && (
+                    <p className="mt-4 text-sm text-emerald-600">
+                      {t("rsvp.saved")}
+                    </p>
+                  )}
                 </>
               ) : (
                 <>
@@ -183,17 +299,22 @@ export function RSVPForm() {
                     {t("rsvp.missTitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    {t("rsvp.missBody", { name: guest.name })}
+                    {t("rsvp.missBody", { name: displayName })}
                   </p>
                 </>
               )}
-              <Button
-                variant="outline"
-                className="mt-6 bg-transparent"
-                onClick={() => setShowConfirmation(false)}
-              >
-                {t("rsvp.update")}
-              </Button>
+              {!rsvpResponse.attending && (
+                <Button
+                  variant="outline"
+                  className="mt-6 bg-transparent"
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    setShowPostAcceptForm(false);
+                  }}
+                >
+                  {t("rsvp.update")}
+                </Button>
+              )}
             </CardContent>
           </Card>
           {rsvpResponse.attending &&
@@ -403,6 +524,25 @@ export function RSVPForm() {
               {t("rsvp.hello", { name: guest.name })}
             </CardTitle>
             <CardDescription>{t("rsvp.question")}</CardDescription>
+            <div className="mt-4 flex flex-col sm:flex-row gap-4">
+              <Button
+                className="flex-1 h-12 gap-2"
+                onClick={() => handleRSVP(true)}
+                disabled={isSubmitting}
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                {isSubmitting ? t("rsvp.submitting") : t("rsvp.accept")}
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-12 gap-2 bg-transparent"
+                onClick={() => handleRSVP(false)}
+                disabled={isSubmitting}
+              >
+                <XCircle className="w-5 h-5" />
+                {t("rsvp.decline")}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             {guest.plus_one_allowed && (
@@ -422,75 +562,80 @@ export function RSVPForm() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="dietary" className="text-sm font-medium">
-                {t("rsvp.dietary")}
-              </Label>
-              <Textarea
-                id="dietary"
-                placeholder={t("rsvp.dietaryPlaceholder")}
-                value={dietaryRestrictions}
-                onChange={(e) => setDietaryRestrictions(e.target.value)}
-                className="resize-none"
-                rows={2}
-              />
-            </div>
+            {rsvpResponse?.attending && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="dietary" className="text-sm font-medium">
+                    {t("rsvp.dietary")}
+                  </Label>
+                  <Textarea
+                    id="dietary"
+                    placeholder={t("rsvp.dietaryPlaceholder")}
+                    value={dietaryRestrictions}
+                    onChange={(e) => setDietaryRestrictions(e.target.value)}
+                    className="resize-none"
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="message" className="text-sm font-medium">
+                    {t("rsvp.message")}
+                  </Label>
+                  <Textarea
+                    id="message"
+                    placeholder={t("rsvp.messagePlaceholder")}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="resize-none"
+                    rows={2}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="message" className="text-sm font-medium">
-                {t("rsvp.message")}
-              </Label>
-              <Textarea
-                id="message"
-                placeholder={t("rsvp.messagePlaceholder")}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="resize-none"
-                rows={2}
-              />
-            </div>
+                {/* Bus Service Section */}
+                <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Bus className="w-4 h-4 text-primary" />
+                    <h4 className="font-serif text-base text-foreground">
+                      {t("rsvp.busTitle")}
+                    </h4>
+                  </div>
+                  <BusSchedule weddingDetails={weddingDetails} />
 
-            {/* Bus Service Section */}
-            <div className="space-y-3 p-4 bg-secondary/40 rounded-md">
-              <div className="flex items-center gap-2">
-                <Bus className="w-4 h-4 text-primary" />
-                <h4 className="font-serif text-base text-foreground">
-                  {t("rsvp.busTitle")}
-                </h4>
-              </div>
-              <BusSchedule weddingDetails={weddingDetails} />
+                  <div className="pt-3 border-t border-border/50">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        type="button"
+                        variant={needsBus ? "default" : "outline"}
+                        className="flex-1 h-11 gap-2"
+                        onClick={() => setNeedsBus(true)}
+                      >
+                        {t("rsvp.busYes")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={!needsBus ? "default" : "outline"}
+                        className="flex-1 h-11 gap-2"
+                        onClick={() => setNeedsBus(false)}
+                      >
+                        {t("rsvp.busNo")}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  className="w-full h-11"
+                  onClick={handlePostAcceptSave}
+                  disabled={isSavingPostAccept}
+                >
+                  {t("rsvp.saveChanges")}
+                </Button>
+                {postAcceptSaved && (
+                  <p className="text-sm text-emerald-600">{t("rsvp.saved")}</p>
+                )}
+              </>
+            )}
 
-              <div className="flex items-center justify-center gap-2 pt-3 border-t border-border/50">
-                <Checkbox
-                  id="needsBus"
-                  checked={needsBus}
-                  onCheckedChange={(checked) => setNeedsBus(checked === true)}
-                />
-                <Label htmlFor="needsBus" className="text-sm cursor-pointer">
-                  {t("rsvp.busOptIn")}
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                className="flex-1 h-12 gap-2"
-                onClick={() => handleRSVP(true)}
-                disabled={isSubmitting}
-              >
-                <CheckCircle2 className="w-5 h-5" />
-                {isSubmitting ? t("rsvp.submitting") : t("rsvp.accept")}
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-12 gap-2 bg-transparent"
-                onClick={() => handleRSVP(false)}
-                disabled={isSubmitting}
-              >
-                <XCircle className="w-5 h-5" />
-                {t("rsvp.decline")}
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>

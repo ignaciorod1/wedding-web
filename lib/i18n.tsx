@@ -108,7 +108,7 @@ const translations: Record<Language, Translations> = {
     "defaults.dropoffLocation": "Lugar de la boda",
     "defaults.dropoffArrivalLocation": "Hotel",
     "footer.message":
-      "Con cariño y emoción, esperamos celebrar contigo.",
+      "Galleta os espera - traed pelotas",
     "hotel.title": "Recomendación de alojamiento",
     "hotel.stay":
       "Recomendamos la zona de la Avenida de La Constitución o Cádiz Centro si queréis usar el autobús a la finca.",

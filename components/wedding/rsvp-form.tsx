@@ -41,13 +41,13 @@ export function RSVPForm() {
   const [postAcceptSaved, setPostAcceptSaved] = useState(false);
   const [isSavingPostAccept, setIsSavingPostAccept] = useState(false);
 
-  if (!guest || !weddingDetails) return null;
-
   useEffect(() => {
     if (rsvpResponse) {
       setShowConfirmation(true);
     }
   }, [rsvpResponse]);
+
+  if (!guest || !weddingDetails) return null;
 
   const busDetails = getBusDetails(weddingDetails, {
     couple_names: t("defaults.couple"),
@@ -125,7 +125,7 @@ export function RSVPForm() {
       t("calendar.weddingDetails"),
       busDetails.ceremony_venue,
       busDetails.wedding_date,
-      busDetails.reception_time?.replace(/[^0-9:]/g, "") || "16:00",
+      busDetails.reception_time?.replace(/[^0-9:]/g, "") || "18:00",
       busDetails.end_time?.replace(/[^0-9:]/g, "") || "23:00"
     );
 
@@ -134,9 +134,15 @@ export function RSVPForm() {
       t("calendar.weddingDetails"),
       busDetails.ceremony_venue,
       busDetails.wedding_date,
-      busDetails.reception_time?.replace(/[^0-9:]/g, "") || "16:00",
+      busDetails.reception_time?.replace(/[^0-9:]/g, "") || "18:00",
       busDetails.end_time?.replace(/[^0-9:]/g, "") || "23:00"
     );
+
+    const pickupLocationForCalendar =
+      busDetails.bus_pickup_location &&
+      busDetails.bus_pickup_location !== t("defaults.pickupLocation")
+        ? busDetails.bus_pickup_location
+        : busDetails.bus_pickup_maps_url;
 
     const shuttleGoogleCalendarUrl = generateGoogleCalendarUrl(
       t("calendar.busTitle", { label: t("bus.pickup") }),
@@ -144,7 +150,7 @@ export function RSVPForm() {
         from: busDetails.bus_pickup_location,
         to: busDetails.ceremony_venue,
       }),
-      busDetails.bus_pickup_location,
+      pickupLocationForCalendar,
       busDetails.wedding_date,
       busDetails.bus_pickup_time,
       busDetails.bus_pickup_arrival_time
@@ -156,11 +162,12 @@ export function RSVPForm() {
         from: busDetails.bus_pickup_location,
         to: busDetails.ceremony_venue,
       }),
-      busDetails.bus_pickup_location,
+      pickupLocationForCalendar,
       busDetails.wedding_date,
       busDetails.bus_pickup_time,
       busDetails.bus_pickup_arrival_time
     );
+
 
     return (
       <section className="py-16 px-4">

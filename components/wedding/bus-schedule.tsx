@@ -237,7 +237,9 @@ export function getBusDetails(
     ceremony_address:
       weddingDetails?.ceremony_address || defaults?.ceremony_address || "",
     ceremony_time:
-      weddingDetails?.ceremony_time || defaults?.ceremony_time || "16:00",
+      weddingDetails?.ceremony_time || defaults?.ceremony_time || "18:00",
+    reception_time:
+      weddingDetails?.reception_time || defaults?.reception_time || "16:00",
     bus_pickup_time:
       weddingDetails?.bus_pickup_time || defaults?.bus_pickup_time || "",
     bus_pickup_location:
@@ -251,6 +253,10 @@ export function getBusDetails(
       "18:30",
     bus_dropoff_time:
       weddingDetails?.bus_dropoff_time || defaults?.bus_dropoff_time || "",
+    bus_dropoff_location:
+      weddingDetails?.bus_dropoff_location ||
+      defaults?.bus_dropoff_location ||
+      "Lugar de la boda",
     bus_dropoff_maps_url: weddingDetails?.bus_dropoff_maps_url || "#",
     bus_dropoff_arrival_time:
       weddingDetails?.bus_dropoff_arrival_time ||
@@ -261,6 +267,7 @@ export function getBusDetails(
       defaults?.bus_dropoff_arrival_location ||
       "Hotel",
     bus_dropoff_arrival_maps_url: weddingDetails?.bus_dropoff_arrival_maps_url || "#",
+    end_time: weddingDetails?.end_time || defaults?.end_time || "23:00",
   };
 }
 
@@ -333,17 +340,6 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
 
       {/* Divider */}
       <div className="border-t border-border/50" />
-
-      {/* Dropoff Schedule */}
-      <ScheduleRow
-        title={t("bus.dropoff")}
-        startTime={details.bus_dropoff_time}
-        startLocation={details.ceremony_venue}
-        startMapsUrl={details.bus_dropoff_arrival_maps_url}
-        endTime={details.bus_dropoff_arrival_time}
-        endLocation={details.bus_dropoff_arrival_location}
-        endMapsUrl={details.bus_dropoff_arrival_maps_url}
-      />
     </div>
   );
 }

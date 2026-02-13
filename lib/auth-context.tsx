@@ -33,6 +33,7 @@ export interface WeddingDetails {
   dance_time?: string | null;
   end_time?: string | null;
   dress_code: string;
+  notas?: string | null;
   iban?: string | null;
   // Bus pickup details
   bus_pickup_time: string;
@@ -59,7 +60,7 @@ export interface RsvpResponse {
   plus_one_name: string | null;
   dietary_restrictions: string | null;
   message: string | null;
-  needs_bus: boolean;
+  needs_bus: "true" | "false" | "null";
   responded_at: string;
 }
 
@@ -70,7 +71,13 @@ interface AuthContextType {
   isLoading: boolean;
   login: (code: string) => Promise<boolean>;
   logout: () => void;
-  submitRsvp: (attending: boolean, plusOneName?: string, dietary?: string, message?: string, needsBus?: boolean) => Promise<boolean>;
+  submitRsvp: (
+    attending: boolean,
+    plusOneName?: string,
+    dietary?: string,
+    message?: string,
+    needsBus?: "true" | "false" | "null"
+  ) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -202,7 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     plusOneName?: string,
     dietary?: string,
     message?: string,
-    needsBus?: boolean
+    needsBus?: "true" | "false" | "null"
   ): Promise<boolean> => {
     if (!guest) {
       console.log("[v0] submitRsvp: No guest found");
@@ -231,7 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
           message: message || null,
-          needs_bus: needsBus || false,
+          needs_bus: attending ? (needsBus ?? "null") : "null",
         })
         .eq("guest_id", guest.id)
         .select()
@@ -255,7 +262,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           plus_one_name: plusOneName || null,
           dietary_restrictions: dietary || null,
           message: message || null,
-          needs_bus: needsBus || false,
+          needs_bus: attending ? (needsBus ?? "null") : "null",
         })
         .select()
         .single();

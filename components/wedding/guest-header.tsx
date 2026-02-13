@@ -47,11 +47,11 @@ export function GuestHeader() {
                   </span>
                 </span>
               )}
-              {showDetails && needsBus !== undefined && (
+              {showDetails && needsBus && needsBus !== "null" && (
                 <span
                   className={`inline-flex items-center gap-1 ${
-                    needsBus ? "text-emerald-600" : "text-rose-600"
-                  } ${needsBus ? "" : "line-through"}`}
+                    needsBus === "true" ? "text-emerald-600" : "text-rose-600"
+                  } ${needsBus === "true" ? "" : "line-through"}`}
                 >
                   <BusFront className="w-3 h-3" />
                   <span className="hidden sm:inline">{t("header.bus")}</span>

@@ -11,7 +11,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, XCircle, Heart, Users, Bus, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -35,7 +34,9 @@ export function RSVPForm() {
     rsvpResponse?.dietary_restrictions ?? ""
   );
   const [message, setMessage] = useState(rsvpResponse?.message ?? "");
-  const [needsBus, setNeedsBus] = useState(rsvpResponse?.needs_bus ?? false);
+  const [needsBus, setNeedsBus] = useState<"true" | "false" | "null">(
+    rsvpResponse?.needs_bus ?? "null"
+  );
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
   const [showPostAcceptForm, setShowPostAcceptForm] = useState(false);
   const [postAcceptSaved, setPostAcceptSaved] = useState(false);
@@ -66,7 +67,7 @@ export function RSVPForm() {
       attending && plusOneName ? plusOneName : undefined,
       dietaryRestrictions || undefined,
       message || undefined,
-      attending && needsBus ? needsBus : false
+      attending ? needsBus : "null"
     );
 
     if (success) {
@@ -80,6 +81,10 @@ export function RSVPForm() {
   };
 
   const handlePostAcceptSave = async () => {
+    if (needsBus === "null") {
+      return;
+    }
+
     setIsSavingPostAccept(true);
 
     const success = await submitRsvp(
@@ -188,24 +193,40 @@ export function RSVPForm() {
                       ` ${t("rsvp.confirmPlusOne", {
                         plusOne: rsvpResponse.plus_one_name,
                       })}`}
-                    {rsvpResponse.needs_bus &&
+                    {rsvpResponse.needs_bus === "true" &&
                       ` ${t("rsvp.confirmBus")}`}
                   </p>
-                  {rsvpResponse.needs_bus && (
-                    <p className="text-sm text-muted-foreground">
-                      {t("rsvp.confirmBusDetails", {
-                        time: busDetails.bus_pickup_time,
-                        location: busDetails.bus_pickup_location,
-                      })}{" "}
-                      <a
-                        href={busDetails.bus_pickup_maps_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline underline-offset-2"
-                      >
-                        {t("hotel.google")}
-                      </a>
-                    </p>
+                  {rsvpResponse.needs_bus === "true" && (
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <p>
+                        {t("rsvp.confirmBusDetails", {
+                          time: busDetails.bus_pickup_time,
+                          location: busDetails.bus_pickup_location,
+                        })}{" "}
+                        <a
+                          href={busDetails.bus_pickup_maps_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-2"
+                        >
+                          {t("hotel.google")}
+                        </a>
+                      </p>
+                      <p>
+                        {t("rsvp.confirmBusReturnDetails", {
+                          time: busDetails.bus_dropoff_time,
+                          location: busDetails.bus_dropoff_arrival_location,
+                        })}{" "}
+                        <a
+                          href={busDetails.bus_dropoff_arrival_maps_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-2"
+                        >
+                          {t("hotel.google")}
+                        </a>
+                      </p>
+                    </div>
                   )}
                   <p className="text-sm text-muted-foreground">
                     {t("rsvp.confirmDate", {
@@ -262,18 +283,18 @@ export function RSVPForm() {
                           <div className="flex flex-col sm:flex-row gap-3">
                             <Button
                               type="button"
-                              variant={needsBus ? "default" : "outline"}
+                              variant={needsBus === "true" ? "default" : "outline"}
                               className="flex-1 h-11 gap-2"
-                              onClick={() => setNeedsBus(true)}
+                              onClick={() => setNeedsBus("true")}
                               disabled={isSavingPostAccept}
                             >
                               {t("rsvp.busYes")}
                             </Button>
                             <Button
                               type="button"
-                              variant={!needsBus ? "default" : "outline"}
+                              variant={needsBus === "false" ? "default" : "outline"}
                               className="flex-1 h-11 gap-2"
-                              onClick={() => setNeedsBus(false)}
+                              onClick={() => setNeedsBus("false")}
                               disabled={isSavingPostAccept}
                             >
                               {t("rsvp.busNo")}
@@ -284,10 +305,15 @@ export function RSVPForm() {
                           type="button"
                           className="w-full h-11"
                           onClick={handlePostAcceptSave}
-                          disabled={isSavingPostAccept}
+                          disabled={isSavingPostAccept || needsBus === "null"}
                         >
                           {t("rsvp.saveChanges")}
                         </Button>
+                        {needsBus === "null" && (
+                          <p className="text-xs text-muted-foreground text-center">
+                            Elige si quieres autobús para guardar.
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -365,7 +391,7 @@ export function RSVPForm() {
                       </Button>
                     </div>
                   </div>
-                  {rsvpResponse.needs_bus &&
+                  {rsvpResponse.needs_bus === "true" &&
                     shuttleGoogleCalendarUrl &&
                     shuttleIcsFileUrl && (
                       <div className="flex flex-col items-center gap-2">
@@ -612,17 +638,17 @@ export function RSVPForm() {
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Button
                         type="button"
-                        variant={needsBus ? "default" : "outline"}
+                        variant={needsBus === "true" ? "default" : "outline"}
                         className="flex-1 h-11 gap-2"
-                        onClick={() => setNeedsBus(true)}
+                        onClick={() => setNeedsBus("true")}
                       >
                         {t("rsvp.busYes")}
                       </Button>
                       <Button
                         type="button"
-                        variant={!needsBus ? "default" : "outline"}
+                        variant={needsBus === "false" ? "default" : "outline"}
                         className="flex-1 h-11 gap-2"
-                        onClick={() => setNeedsBus(false)}
+                        onClick={() => setNeedsBus("false")}
                       >
                         {t("rsvp.busNo")}
                       </Button>
@@ -633,10 +659,15 @@ export function RSVPForm() {
                   type="button"
                   className="w-full h-11"
                   onClick={handlePostAcceptSave}
-                  disabled={isSavingPostAccept}
+                  disabled={isSavingPostAccept || needsBus === "null"}
                 >
                   {t("rsvp.saveChanges")}
                 </Button>
+                {needsBus === "null" && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Elige si quieres autobús para guardar.
+                  </p>
+                )}
                 {postAcceptSaved && (
                   <p className="text-sm text-emerald-600">{t("rsvp.saved")}</p>
                 )}

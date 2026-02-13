@@ -340,6 +340,17 @@ export function BusSchedule({ weddingDetails }: BusScheduleProps) {
 
       {/* Divider */}
       <div className="border-t border-border/50" />
+
+      {/* Dropoff Schedule */}
+      <ScheduleRow
+        title={t("bus.dropoff")}
+        startTime={details.bus_dropoff_time}
+        startLocation={details.ceremony_venue}
+        startMapsUrl={details.bus_dropoff_arrival_maps_url}
+        endTime={details.bus_dropoff_arrival_time}
+        endLocation={details.bus_dropoff_arrival_location}
+        endMapsUrl={details.bus_dropoff_arrival_maps_url}
+      />
     </div>
   );
 }

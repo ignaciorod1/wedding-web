@@ -8,6 +8,7 @@ import {
   Clock,
   CalendarDays,
   Shirt,
+  Info,
   Heart,
   Landmark,
   Camera,
@@ -153,14 +154,32 @@ export function EventDetails() {
 
         {/* Dress Code */}
         <Card className="mt-6 border-border/50">
-          <CardContent className="flex items-center justify-center gap-4 py-6">
-            <Shirt className="w-5 h-5 text-accent" />
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">{t("event.dressCode")}</p>
-              <p className="font-medium text-foreground">
-                {weddingDetails.dress_code}
-              </p>
-            </div>
+          <CardHeader className="pb-4">
+            <CardTitle className="font-serif text-xl font-normal flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                <Shirt className="w-5 h-5 text-accent" />
+              </div>
+              {t("event.dressCode")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="font-medium text-foreground">{weddingDetails.dress_code}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4 border-border/50">
+          <CardHeader className="pb-4">
+            <CardTitle className="font-serif text-xl font-normal flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                <Info className="w-5 h-5 text-accent" />
+              </div>
+              {t("event.extraNotes")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="font-medium text-foreground">
+              {weddingDetails.notas || t("event.cloakroom")}
+            </p>
           </CardContent>
         </Card>
       </div>

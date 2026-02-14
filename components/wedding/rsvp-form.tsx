@@ -38,7 +38,6 @@ export function RSVPForm() {
     rsvpResponse?.needs_bus ?? "null"
   );
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
-  const [showPostAcceptForm, setShowPostAcceptForm] = useState(false);
   const [postAcceptSaved, setPostAcceptSaved] = useState(false);
   const [isSavingPostAccept, setIsSavingPostAccept] = useState(false);
 
@@ -72,7 +71,6 @@ export function RSVPForm() {
 
     if (success) {
       setShowConfirmation(true);
-      setShowPostAcceptForm(attending);
       if (attending) {
         setPostAcceptSaved(false);
       }
@@ -80,21 +78,34 @@ export function RSVPForm() {
     setIsSubmitting(false);
   };
 
-  const handlePostAcceptSave = async () => {
-    if (needsBus === "null") {
-      return;
-    }
-
+  const handleBusPreferenceSelect = async (value: "true" | "false") => {
+    const attendingState = rsvpResponse?.attending ?? true;
+    setNeedsBus(value);
     setIsSavingPostAccept(true);
-
     const success = await submitRsvp(
-      true,
+      attendingState,
       plusOneName || undefined,
       dietaryRestrictions || undefined,
       message || undefined,
-      needsBus
+      attendingState ? value : "null"
     );
+    if (success) {
+      setPostAcceptSaved(true);
+      window.setTimeout(() => setPostAcceptSaved(false), 2000);
+    }
+    setIsSavingPostAccept(false);
+  };
 
+  const saveDraftNow = async () => {
+    const attendingState = rsvpResponse?.attending ?? true;
+    setIsSavingPostAccept(true);
+    const success = await submitRsvp(
+      attendingState,
+      plusOneName || undefined,
+      dietaryRestrictions || undefined,
+      message || undefined,
+      attendingState ? needsBus : "null"
+    );
     if (success) {
       setPostAcceptSaved(true);
       window.setTimeout(() => setPostAcceptSaved(false), 2000);
@@ -238,13 +249,11 @@ export function RSVPForm() {
                     className="mt-6 bg-transparent"
                     onClick={() => {
                       setShowConfirmation(false);
-                      setShowPostAcceptForm(false);
                     }}
                   >
                     {t("rsvp.update")}
                   </Button>
-                  {showPostAcceptForm && (
-                    <div className="mt-6 space-y-4 text-left">
+                  <div className="mt-6 space-y-4 text-left">
                       <div className="space-y-2">
                         <Label htmlFor="dietary" className="text-sm font-medium">
                           {t("rsvp.dietary")}
@@ -257,6 +266,15 @@ export function RSVPForm() {
                           className="resize-none"
                           rows={2}
                         />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 bg-transparent"
+                          onClick={() => void saveDraftNow()}
+                        >
+                          Guardar
+                        </Button>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="message" className="text-sm font-medium">
@@ -270,6 +288,15 @@ export function RSVPForm() {
                           className="resize-none"
                           rows={2}
                         />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 bg-transparent"
+                          onClick={() => void saveDraftNow()}
+                        >
+                          Guardar
+                        </Button>
                       </div>
                       <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
                         <div className="flex items-center gap-2">
@@ -285,7 +312,7 @@ export function RSVPForm() {
                               type="button"
                               variant={needsBus === "true" ? "default" : "outline"}
                               className="flex-1 h-11 gap-2"
-                              onClick={() => setNeedsBus("true")}
+                              onClick={() => void handleBusPreferenceSelect("true")}
                               disabled={isSavingPostAccept}
                             >
                               {t("rsvp.busYes")}
@@ -294,29 +321,15 @@ export function RSVPForm() {
                               type="button"
                               variant={needsBus === "false" ? "default" : "outline"}
                               className="flex-1 h-11 gap-2"
-                              onClick={() => setNeedsBus("false")}
+                              onClick={() => void handleBusPreferenceSelect("false")}
                               disabled={isSavingPostAccept}
                             >
                               {t("rsvp.busNo")}
                             </Button>
                           </div>
                         </div>
-                        <Button
-                          type="button"
-                          className="w-full h-11"
-                          onClick={handlePostAcceptSave}
-                          disabled={isSavingPostAccept || needsBus === "null"}
-                        >
-                          {t("rsvp.saveChanges")}
-                        </Button>
-                        {needsBus === "null" && (
-                          <p className="text-xs text-muted-foreground text-center">
-                            Elige si quieres autobús para guardar.
-                          </p>
-                        )}
                       </div>
                     </div>
-                  )}
                   {postAcceptSaved && (
                     <p className="mt-4 text-sm text-emerald-600">
                       {t("rsvp.saved")}
@@ -334,6 +347,83 @@ export function RSVPForm() {
                   <p className="text-muted-foreground">
                     {t("rsvp.missBody", { name: displayName })}
                   </p>
+                  <div className="mt-6 space-y-4 text-left">
+                    <div className="space-y-2">
+                      <Label htmlFor="dietary" className="text-sm font-medium">
+                        {t("rsvp.dietary")}
+                      </Label>
+                      <Textarea
+                        id="dietary"
+                        placeholder={t("rsvp.dietaryPlaceholder")}
+                        value={dietaryRestrictions}
+                        onChange={(e) => setDietaryRestrictions(e.target.value)}
+                        className="resize-none"
+                        rows={2}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 bg-transparent"
+                        onClick={() => void saveDraftNow()}
+                      >
+                        Guardar
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-sm font-medium">
+                        {t("rsvp.message")}
+                      </Label>
+                      <Textarea
+                        id="message"
+                        placeholder={t("rsvp.messagePlaceholder")}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="resize-none"
+                        rows={2}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 bg-transparent"
+                        onClick={() => void saveDraftNow()}
+                      >
+                        Guardar
+                      </Button>
+                    </div>
+                    <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Bus className="w-4 h-4 text-primary" />
+                        <h4 className="font-serif text-base text-foreground">
+                          {t("rsvp.busTitle")}
+                        </h4>
+                      </div>
+                      <BusSchedule weddingDetails={weddingDetails} />
+                      <div className="pt-3 border-t border-border/50">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <Button
+                            type="button"
+                            variant={needsBus === "true" ? "default" : "outline"}
+                            className="flex-1 h-11 gap-2"
+                            onClick={() => void handleBusPreferenceSelect("true")}
+                            disabled={isSavingPostAccept}
+                          >
+                            {t("rsvp.busYes")}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={needsBus === "false" ? "default" : "outline"}
+                            className="flex-1 h-11 gap-2"
+                            onClick={() => void handleBusPreferenceSelect("false")}
+                            disabled={isSavingPostAccept}
+                          >
+                            {t("rsvp.busNo")}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </>
               )}
               {!rsvpResponse.attending && (
@@ -342,7 +432,6 @@ export function RSVPForm() {
                   className="mt-6 bg-transparent"
                   onClick={() => {
                     setShowConfirmation(false);
-                    setShowPostAcceptForm(false);
                   }}
                 >
                   {t("rsvp.update")}
@@ -609,6 +698,15 @@ export function RSVPForm() {
                     className="resize-none"
                     rows={2}
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 bg-transparent"
+                    onClick={() => void saveDraftNow()}
+                  >
+                    Guardar
+                  </Button>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="message" className="text-sm font-medium">
@@ -622,6 +720,15 @@ export function RSVPForm() {
                     className="resize-none"
                     rows={2}
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 bg-transparent"
+                    onClick={() => void saveDraftNow()}
+                  >
+                    Guardar
+                  </Button>
                 </div>
 
                 {/* Bus Service Section */}
@@ -640,7 +747,7 @@ export function RSVPForm() {
                         type="button"
                         variant={needsBus === "true" ? "default" : "outline"}
                         className="flex-1 h-11 gap-2"
-                        onClick={() => setNeedsBus("true")}
+                        onClick={() => void handleBusPreferenceSelect("true")}
                       >
                         {t("rsvp.busYes")}
                       </Button>
@@ -648,26 +755,13 @@ export function RSVPForm() {
                         type="button"
                         variant={needsBus === "false" ? "default" : "outline"}
                         className="flex-1 h-11 gap-2"
-                        onClick={() => setNeedsBus("false")}
+                        onClick={() => void handleBusPreferenceSelect("false")}
                       >
                         {t("rsvp.busNo")}
                       </Button>
                     </div>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  className="w-full h-11"
-                  onClick={handlePostAcceptSave}
-                  disabled={isSavingPostAccept || needsBus === "null"}
-                >
-                  {t("rsvp.saveChanges")}
-                </Button>
-                {needsBus === "null" && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Elige si quieres autobús para guardar.
-                  </p>
-                )}
                 {postAcceptSaved && (
                   <p className="text-sm text-emerald-600">{t("rsvp.saved")}</p>
                 )}

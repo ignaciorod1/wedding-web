@@ -281,9 +281,11 @@ export function RSVPForm() {
                         />
                         <Button
                           type="button"
-                          variant={dietarySent ? "default" : "outline"}
+                          variant="outline"
                           size="sm"
-                          className="h-8 bg-transparent"
+                          className={`h-8 active:bg-primary active:text-primary-foreground active:border-primary ${
+                            dietarySent ? "opacity-60" : "opacity-100"
+                          }`}
                           onClick={() => void handleSendField("dietary")}
                         >
                           Enviar
@@ -306,9 +308,11 @@ export function RSVPForm() {
                         />
                         <Button
                           type="button"
-                          variant={messageSent ? "default" : "outline"}
+                          variant="outline"
                           size="sm"
-                          className="h-8 bg-transparent"
+                          className={`h-8 active:bg-primary active:text-primary-foreground active:border-primary ${
+                            messageSent ? "opacity-60" : "opacity-100"
+                          }`}
                           onClick={() => void handleSendField("message")}
                         >
                           Enviar
@@ -327,7 +331,7 @@ export function RSVPForm() {
                             <Button
                               type="button"
                               variant={needsBus === "true" ? "default" : "outline"}
-                              className="flex-1 h-11 gap-2"
+                              className="flex-1 h-11 gap-2 active:bg-primary active:text-primary-foreground active:border-primary"
                               onClick={() => void handleBusPreferenceSelect("true")}
                               disabled={isSavingPostAccept}
                             >
@@ -336,7 +340,7 @@ export function RSVPForm() {
                             <Button
                               type="button"
                               variant={needsBus === "false" ? "default" : "outline"}
-                              className="flex-1 h-11 gap-2"
+                              className="flex-1 h-11 gap-2 active:bg-primary active:text-primary-foreground active:border-primary"
                               onClick={() => void handleBusPreferenceSelect("false")}
                               disabled={isSavingPostAccept}
                             >
@@ -363,89 +367,6 @@ export function RSVPForm() {
                   <p className="text-muted-foreground">
                     {t("rsvp.missBody", { name: displayName })}
                   </p>
-                  <div className="mt-6 space-y-4 text-left">
-                    <div className="space-y-2">
-                      <Label htmlFor="dietary" className="text-sm font-medium">
-                        {t("rsvp.dietary")}
-                      </Label>
-                      <Textarea
-                        id="dietary"
-                        placeholder={t("rsvp.dietaryPlaceholder")}
-                        value={dietaryRestrictions}
-                        onChange={(e) => {
-                          setDietaryRestrictions(e.target.value);
-                          setDietarySent(false);
-                        }}
-                        className="resize-none"
-                        rows={2}
-                      />
-                      <Button
-                        type="button"
-                        variant={dietarySent ? "default" : "outline"}
-                        size="sm"
-                        className="h-8 bg-transparent"
-                        onClick={() => void handleSendField("dietary")}
-                      >
-                        Enviar
-                      </Button>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="message" className="text-sm font-medium">
-                        {t("rsvp.message")}
-                      </Label>
-                      <Textarea
-                        id="message"
-                        placeholder={t("rsvp.messagePlaceholder")}
-                        value={message}
-                        onChange={(e) => {
-                          setMessage(e.target.value);
-                          setMessageSent(false);
-                        }}
-                        className="resize-none"
-                        rows={2}
-                      />
-                      <Button
-                        type="button"
-                        variant={messageSent ? "default" : "outline"}
-                        size="sm"
-                        className="h-8 bg-transparent"
-                        onClick={() => void handleSendField("message")}
-                      >
-                        Enviar
-                      </Button>
-                    </div>
-                    <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
-                      <div className="flex items-center gap-2">
-                        <Bus className="w-4 h-4 text-primary" />
-                        <h4 className="font-serif text-base text-foreground">
-                          {t("rsvp.busTitle")}
-                        </h4>
-                      </div>
-                      <BusSchedule weddingDetails={weddingDetails} />
-                      <div className="pt-3 border-t border-border/50">
-                        <div className="flex flex-col sm:flex-row gap-3">
-                          <Button
-                            type="button"
-                            variant={needsBus === "true" ? "default" : "outline"}
-                            className="flex-1 h-11 gap-2"
-                            onClick={() => void handleBusPreferenceSelect("true")}
-                            disabled={isSavingPostAccept}
-                          >
-                            {t("rsvp.busYes")}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={needsBus === "false" ? "default" : "outline"}
-                            className="flex-1 h-11 gap-2"
-                            onClick={() => void handleBusPreferenceSelect("false")}
-                            disabled={isSavingPostAccept}
-                          >
-                            {t("rsvp.busNo")}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </>
               )}
               {!rsvpResponse.attending && (
@@ -640,6 +561,9 @@ export function RSVPForm() {
                     <p className="text-sm font-semibold text-foreground">
                       {weddingDetails.iban || t("gifts.ibanMissing")}
                     </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      o preferiblemente metálico
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -725,9 +649,11 @@ export function RSVPForm() {
                       />
                       <Button
                         type="button"
-                        variant={dietarySent ? "default" : "outline"}
+                        variant="outline"
                         size="sm"
-                        className="h-8 bg-transparent"
+                        className={`h-8 active:bg-primary active:text-primary-foreground active:border-primary ${
+                          dietarySent ? "opacity-60" : "opacity-100"
+                        }`}
                         onClick={() => void handleSendField("dietary")}
                       >
                         Enviar
@@ -750,9 +676,11 @@ export function RSVPForm() {
                       />
                       <Button
                         type="button"
-                        variant={messageSent ? "default" : "outline"}
+                        variant="outline"
                         size="sm"
-                        className="h-8 bg-transparent"
+                        className={`h-8 active:bg-primary active:text-primary-foreground active:border-primary ${
+                          messageSent ? "opacity-60" : "opacity-100"
+                        }`}
                         onClick={() => void handleSendField("message")}
                       >
                         Enviar
@@ -774,7 +702,7 @@ export function RSVPForm() {
                       <Button
                         type="button"
                         variant={needsBus === "true" ? "default" : "outline"}
-                        className="flex-1 h-11 gap-2"
+                        className="flex-1 h-11 gap-2 active:bg-primary active:text-primary-foreground active:border-primary"
                         onClick={() => void handleBusPreferenceSelect("true")}
                       >
                         {t("rsvp.busYes")}
@@ -782,7 +710,7 @@ export function RSVPForm() {
                       <Button
                         type="button"
                         variant={needsBus === "false" ? "default" : "outline"}
-                        className="flex-1 h-11 gap-2"
+                        className="flex-1 h-11 gap-2 active:bg-primary active:text-primary-foreground active:border-primary"
                         onClick={() => void handleBusPreferenceSelect("false")}
                       >
                         {t("rsvp.busNo")}

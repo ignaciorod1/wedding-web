@@ -40,6 +40,8 @@ export function RSVPForm() {
   const [showConfirmation, setShowConfirmation] = useState(!!rsvpResponse);
   const [postAcceptSaved, setPostAcceptSaved] = useState(false);
   const [isSavingPostAccept, setIsSavingPostAccept] = useState(false);
+  const [dietarySent, setDietarySent] = useState(false);
+  const [messageSent, setMessageSent] = useState(false);
 
   useEffect(() => {
     if (rsvpResponse) {
@@ -96,7 +98,7 @@ export function RSVPForm() {
     setIsSavingPostAccept(false);
   };
 
-  const saveDraftNow = async () => {
+  const saveDraftNow = async (): Promise<boolean> => {
     const attendingState = rsvpResponse?.attending ?? true;
     setIsSavingPostAccept(true);
     const success = await submitRsvp(
@@ -111,6 +113,14 @@ export function RSVPForm() {
       window.setTimeout(() => setPostAcceptSaved(false), 2000);
     }
     setIsSavingPostAccept(false);
+    return success;
+  };
+
+  const handleSendField = async (field: "dietary" | "message") => {
+    const success = await saveDraftNow();
+    if (!success) return;
+    if (field === "dietary") setDietarySent(true);
+    if (field === "message") setMessageSent(true);
   };
 
   if (showConfirmation && rsvpResponse) {
@@ -262,18 +272,21 @@ export function RSVPForm() {
                           id="dietary"
                           placeholder={t("rsvp.dietaryPlaceholder")}
                           value={dietaryRestrictions}
-                          onChange={(e) => setDietaryRestrictions(e.target.value)}
+                          onChange={(e) => {
+                            setDietaryRestrictions(e.target.value);
+                            setDietarySent(false);
+                          }}
                           className="resize-none"
                           rows={2}
                         />
                         <Button
                           type="button"
-                          variant="outline"
+                          variant={dietarySent ? "default" : "outline"}
                           size="sm"
                           className="h-8 bg-transparent"
-                          onClick={() => void saveDraftNow()}
+                          onClick={() => void handleSendField("dietary")}
                         >
-                          Guardar
+                          Enviar
                         </Button>
                       </div>
                       <div className="space-y-2">
@@ -284,18 +297,21 @@ export function RSVPForm() {
                           id="message"
                           placeholder={t("rsvp.messagePlaceholder")}
                           value={message}
-                          onChange={(e) => setMessage(e.target.value)}
+                          onChange={(e) => {
+                            setMessage(e.target.value);
+                            setMessageSent(false);
+                          }}
                           className="resize-none"
                           rows={2}
                         />
                         <Button
                           type="button"
-                          variant="outline"
+                          variant={messageSent ? "default" : "outline"}
                           size="sm"
                           className="h-8 bg-transparent"
-                          onClick={() => void saveDraftNow()}
+                          onClick={() => void handleSendField("message")}
                         >
-                          Guardar
+                          Enviar
                         </Button>
                       </div>
                       <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
@@ -356,18 +372,21 @@ export function RSVPForm() {
                         id="dietary"
                         placeholder={t("rsvp.dietaryPlaceholder")}
                         value={dietaryRestrictions}
-                        onChange={(e) => setDietaryRestrictions(e.target.value)}
+                        onChange={(e) => {
+                          setDietaryRestrictions(e.target.value);
+                          setDietarySent(false);
+                        }}
                         className="resize-none"
                         rows={2}
                       />
                       <Button
                         type="button"
-                        variant="outline"
+                        variant={dietarySent ? "default" : "outline"}
                         size="sm"
                         className="h-8 bg-transparent"
-                        onClick={() => void saveDraftNow()}
+                        onClick={() => void handleSendField("dietary")}
                       >
-                        Guardar
+                        Enviar
                       </Button>
                     </div>
                     <div className="space-y-2">
@@ -378,18 +397,21 @@ export function RSVPForm() {
                         id="message"
                         placeholder={t("rsvp.messagePlaceholder")}
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={(e) => {
+                          setMessage(e.target.value);
+                          setMessageSent(false);
+                        }}
                         className="resize-none"
                         rows={2}
                       />
                       <Button
                         type="button"
-                        variant="outline"
+                        variant={messageSent ? "default" : "outline"}
                         size="sm"
                         className="h-8 bg-transparent"
-                        onClick={() => void saveDraftNow()}
+                        onClick={() => void handleSendField("message")}
                       >
-                        Guardar
+                        Enviar
                       </Button>
                     </div>
                     <div className="space-y-4 p-4 bg-secondary/40 rounded-md">
@@ -693,20 +715,23 @@ export function RSVPForm() {
                   <Textarea
                     id="dietary"
                     placeholder={t("rsvp.dietaryPlaceholder")}
-                    value={dietaryRestrictions}
-                    onChange={(e) => setDietaryRestrictions(e.target.value)}
-                    className="resize-none"
-                    rows={2}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 bg-transparent"
-                    onClick={() => void saveDraftNow()}
-                  >
-                    Guardar
-                  </Button>
+                        value={dietaryRestrictions}
+                        onChange={(e) => {
+                          setDietaryRestrictions(e.target.value);
+                          setDietarySent(false);
+                        }}
+                        className="resize-none"
+                        rows={2}
+                      />
+                      <Button
+                        type="button"
+                        variant={dietarySent ? "default" : "outline"}
+                        size="sm"
+                        className="h-8 bg-transparent"
+                        onClick={() => void handleSendField("dietary")}
+                      >
+                        Enviar
+                      </Button>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="message" className="text-sm font-medium">
@@ -715,20 +740,23 @@ export function RSVPForm() {
                   <Textarea
                     id="message"
                     placeholder={t("rsvp.messagePlaceholder")}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="resize-none"
-                    rows={2}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 bg-transparent"
-                    onClick={() => void saveDraftNow()}
-                  >
-                    Guardar
-                  </Button>
+                        value={message}
+                        onChange={(e) => {
+                          setMessage(e.target.value);
+                          setMessageSent(false);
+                        }}
+                        className="resize-none"
+                        rows={2}
+                      />
+                      <Button
+                        type="button"
+                        variant={messageSent ? "default" : "outline"}
+                        size="sm"
+                        className="h-8 bg-transparent"
+                        onClick={() => void handleSendField("message")}
+                      >
+                        Enviar
+                      </Button>
                 </div>
 
                 {/* Bus Service Section */}

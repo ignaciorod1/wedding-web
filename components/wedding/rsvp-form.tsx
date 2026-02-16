@@ -54,8 +54,8 @@ export function RSVPForm() {
   const busDetails = getBusDetails(weddingDetails, {
     couple_names: t("defaults.couple"),
     ceremony_venue: t("defaults.venue"),
-    bus_pickup_location: t("defaults.pickupLocation"),
-    bus_pickup_arrival_location: t("defaults.pickupArrivalLocation"),
+    bus_pickup_location: t("defaults.dropoffArrivalLocation"),
+    bus_pickup_arrival_location: t("defaults.dropoffLocation"),
     bus_dropoff_location: t("defaults.dropoffLocation"),
     bus_dropoff_arrival_location: t("defaults.dropoffArrivalLocation"),
   });

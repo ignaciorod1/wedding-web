@@ -54,8 +54,8 @@ export function RSVPForm() {
   const busDetails = getBusDetails(weddingDetails, {
     couple_names: t("defaults.couple"),
     ceremony_venue: t("defaults.venue"),
-    bus_pickup_location: t("defaults.pickupLocation"),
-    bus_pickup_arrival_location: t("defaults.pickupArrivalLocation"),
+    bus_pickup_location: t("defaults.dropoffArrivalLocation"),
+    bus_pickup_arrival_location: t("defaults.dropoffLocation"),
     bus_dropoff_location: t("defaults.dropoffLocation"),
     bus_dropoff_arrival_location: t("defaults.dropoffArrivalLocation"),
   });
@@ -555,14 +555,9 @@ export function RSVPForm() {
                     {t("gifts.message")}
                   </p>
                   <div className="text-center">
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                      {t("gifts.ibanLabel")}
-                    </p>
-                    <p className="text-sm font-semibold text-foreground">
-                      {weddingDetails.iban || t("gifts.ibanMissing")}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      o preferiblemente metálico
+                
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Os agradeceríamos mucho si pudiese ser en metálico en favor de transferencia o bizum.
                     </p>
                   </div>
                 </CardContent>

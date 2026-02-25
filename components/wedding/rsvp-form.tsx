@@ -557,7 +557,7 @@ export function RSVPForm() {
                   <div className="text-center">
                 
                     <p className="text-sm text-muted-foreground mt-2">
-                      Os agradeceríamos mucho si pudiese ser en metálico en favor de transferencia o bizum.
+                      Os agradeceríamos mucho si pudiese ser en metálico en favor de transferencia. Evitad hacer bizums debido al límite impuesto por Hacienda.
                     </p>
                   </div>
                 </CardContent>
